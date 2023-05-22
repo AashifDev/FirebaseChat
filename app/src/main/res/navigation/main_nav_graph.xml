@@ -3,16 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/loginFragment">
-
+    app:startDestination="@id/homeFragment">
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.firebasechat.ui.authentication.fragments.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
+        android:id="@+id/homeFragment"
+        android:name="com.example.firebasechat.ui.mainUi.fragment.HomeFragment"
+        android:label="ChitChat"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_viewSendMessageFragment"
+            app:destination="@id/viewSendMessageFragment" />
+    </fragment>
     <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.firebasechat.ui.authentication.fragments.RegisterFragment"
-        android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        android:id="@+id/viewSendMessageFragment"
+        android:name="com.example.firebasechat.ViewSendMessageFragment"
+        android:label="fragment_view_send_message"
+        tools:layout="@layout/fragment_view_send_message" >
+        <action
+            android:id="@+id/action_viewSendMessageFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>
