@@ -30,6 +30,7 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : Recyc
         holder.itemView.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("userName", item.name)
+                putString("uid",item.uid)
             }
             holder.user.findNavController().navigate(R.id.action_homeFragment_to_viewSendMessageFragment,bundle)
         }

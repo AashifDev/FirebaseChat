@@ -57,6 +57,7 @@ class HomeFragment : Fragment() {
                 userList.clear()
                 for (postSnapShot in snapshot.children) {
                     val user = postSnapShot.getValue(User::class.java)
+                    //current user will not show in list
                     if (firebaseAuth.currentUser?.uid != user?.uid){
                         userList.add(user!!)
                     }

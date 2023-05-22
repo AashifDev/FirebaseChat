@@ -9,17 +9,19 @@
         android:id="@+id/receive"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="The sent message will appear here."
-        app:layout_constraintStart_toStartOf="parent"
-        android:gravity="start"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="6dp"
         android:layout_marginTop="6dp"
         android:layout_marginBottom="6dp"
-        android:layout_marginStart="6dp"
         android:background="@drawable/receive_msg_background"
-        android:padding="8dp"/>
+        android:gravity="start"
+        android:padding="8dp"
+        android:text="The sent message will appear here."
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewSendMessageFragment"
-        android:name="com.example.firebasechat.ViewSendMessageFragment"
+        android:name="com.example.firebasechat.ui.mainUi.fragment.ViewSendMessageFragment"
         android:label="fragment_view_send_message"
         tools:layout="@layout/fragment_view_send_message" >
         <action
