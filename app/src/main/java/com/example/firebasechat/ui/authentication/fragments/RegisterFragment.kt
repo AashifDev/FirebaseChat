@@ -1,12 +1,19 @@
 package com.example.firebasechat.ui.authentication.fragments
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterBinding
@@ -17,6 +24,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 
 
 class RegisterFragment : Fragment() {
@@ -24,12 +33,14 @@ class RegisterFragment : Fragment() {
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var firebaseDb: DatabaseReference
     lateinit var prefManager: PrefManager
+    lateinit var firebaseStorage: FirebaseStorage
 
     var email = ""
     var pass = ""
     var conPass = ""
     var name = ""
     var uid = ""
+    val profileImage:Boolean = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,8 +49,34 @@ class RegisterFragment : Fragment() {
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
+        firebaseStorage = Firebase.storage
         prefManager = PrefManager(requireContext())
+
+        binding.profile.setOnClickListener {
+            addProfileImage()
+        }
         return binding.root
+    }
+
+    private fun addProfileImage() {
+        if (ActivityCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(requireActivity(),Array(1){android.Manifest.permission.CAMERA},101)
+        }else{
+            camera()
+        }
+    }
+
+    private fun camera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(intent, 101)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RESULT_OK){
+            val data = data!!.data as Bitmap
+            binding.profile.setImageBitmap(data)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -96,7 +133,7 @@ class RegisterFragment : Fragment() {
         }else if (pass.length < 6){
             Toast.makeText(context, "Minimum 6 character required", Toast.LENGTH_SHORT).show()
             return false
-        }else if (conPass != pass){
+        }else if (conPass != pass) {
             binding.etConPass.error = "Password does not matched"
             binding.etConPass.requestFocus()
             return false
