@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
 import com.example.firebasechat.model.User
@@ -34,17 +35,21 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
-
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
+        binding.progressBar.visibility = View.VISIBLE
+        binding.noChat.visibility = View.GONE
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         userList = ArrayList()
+        adapter = UserAdapter(requireContext(),userList)
         setUserToRecyclerView()
     }
 
@@ -61,7 +66,13 @@ class HomeFragment : Fragment() {
                     if (firebaseAuth.currentUser?.uid != user?.uid){
                         userList.add(user!!)
                     }
-                    adapter = UserAdapter(requireContext(),userList)
+                    if (userList.isEmpty()){
+                        binding.progressBar.visibility = View.GONE
+                        binding.noChat.visibility = View.VISIBLE
+                    }else{
+                        binding.progressBar.visibility = View.GONE
+                        binding.noChat.visibility = View.GONE
+                    }
                     binding.recyclerViewUser.adapter = adapter
                 }
                 adapter.notifyDataSetChanged()
@@ -69,6 +80,7 @@ class HomeFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e("err",error.message)
+                binding.progressBar.visibility = View.GONE
             }
 
         })

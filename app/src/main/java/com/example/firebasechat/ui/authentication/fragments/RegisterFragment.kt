@@ -1,5 +1,6 @@
 package com.example.firebasechat.ui.authentication.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
+import com.example.firebasechat.session.PrefManager
+import com.example.firebasechat.ui.mainUi.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -20,6 +23,7 @@ class RegisterFragment : Fragment() {
     lateinit var binding: FragmentRegisterBinding
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var firebaseDb: DatabaseReference
+    lateinit var prefManager: PrefManager
 
     var email = ""
     var pass = ""
@@ -34,13 +38,12 @@ class RegisterFragment : Fragment() {
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
-
+        prefManager = PrefManager(requireContext())
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.btnRegister.setOnClickListener {
             if (validCredential()){
                 setRegister()
@@ -50,14 +53,15 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setRegister() {
-
         firebaseAuth.createUserWithEmailAndPassword(email,pass)
             .addOnCompleteListener {
                 if (it.isSuccessful){
                     Toast.makeText(context, "Successfully Registered", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
-                    findNavController().navigate(R.id.loginFragment)
+                    startActivity(Intent(requireActivity(), MainActivity::class.java))
+                    requireActivity().finish()
                     addUserToFirebaseDatabase(name, email)
+                    prefManager.saveUser(email)
                 }else{
                     Toast.makeText(context, "Registration Failed! try again", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE

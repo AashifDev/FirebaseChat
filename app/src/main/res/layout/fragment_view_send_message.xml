@@ -19,7 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/editTextWriteMessage"
         android:layout_width="0dp"
@@ -28,6 +27,8 @@
         android:layout_weight=".8"
         android:background="@drawable/bg_edit_text"
         android:hint="Type message..."
+        android:maxLines="2"
+        android:nestedScrollingEnabled="true"
         android:theme="@style/Widget.Material3.TextInputEditText.OutlinedBox"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/send"
@@ -48,9 +49,5 @@
         app:layout_constraintBottom_toBottomOf="@+id/editTextWriteMessage"
         app:layout_constraintEnd_toEndOf="@+id/recyclerViewMessage"
         app:layout_constraintTop_toTopOf="@+id/editTextWriteMessage" />
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

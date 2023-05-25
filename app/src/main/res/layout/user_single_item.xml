@@ -6,14 +6,27 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/person"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/notify"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:backgroundTint="@color/blue"
+        app:cardCornerRadius="50dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/profile_image"
+        app:layout_constraintTop_toTopOf="@+id/profile_image" />
+
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/userName"

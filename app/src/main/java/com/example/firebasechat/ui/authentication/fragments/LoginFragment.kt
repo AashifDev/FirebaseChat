@@ -77,7 +77,6 @@ class LoginFragment : Fragment() {
                     Toast.makeText(context, "Login Failed! try again", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
                 }
-
             }
 
     }
