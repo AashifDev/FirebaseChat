@@ -1,21 +1,18 @@
 package com.example.firebasechat.ui.authentication.fragments
 
-import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.navigation.fragment.findNavController
-import com.example.firebasechat.R
+import androidx.fragment.app.Fragment
 import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
@@ -26,21 +23,25 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-
+import java.io.ByteArrayOutputStream
 
 class RegisterFragment : Fragment() {
+
     lateinit var binding: FragmentRegisterBinding
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var firebaseDb: DatabaseReference
     lateinit var prefManager: PrefManager
     lateinit var firebaseStorage: FirebaseStorage
 
+    val REQUEST_CODE = 101
     var email = ""
     var pass = ""
     var conPass = ""
     var name = ""
     var uid = ""
-    val profileImage:Boolean = false
+    var profile: Uri? = null
+    var profileImage:Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,7 +50,7 @@ class RegisterFragment : Fragment() {
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
-        firebaseStorage = Firebase.storage
+        firebaseStorage = FirebaseStorage.getInstance()
         prefManager = PrefManager(requireContext())
 
         binding.profile.setOnClickListener {
@@ -68,14 +69,27 @@ class RegisterFragment : Fragment() {
 
     private fun camera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, 101)
+        startActivityForResult(intent, REQUEST_CODE)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RESULT_OK){
-            val data = data!!.data as Bitmap
-            binding.profile.setImageBitmap(data)
+        if (requestCode == REQUEST_CODE){
+            //profile = data!!.extras!!.get("data") as Uri?
+            try {
+                val byte = ByteArrayOutputStream()
+                val bitmapImage = data!!.extras!!.get("data") as Bitmap
+                bitmapImage.compress(Bitmap.CompressFormat.JPEG,100, byte)
+                val uriImg = MediaStore.Images.Media.insertImage(context?.contentResolver,bitmapImage,"image",null)
+                val uri = Uri.parse(uriImg)
+                binding.profile.setImageURI(uri)
+                profileImage = true
+            }
+            catch (e: Exception){
+                e.printStackTrace()
+            }
+
         }
     }
 
@@ -98,6 +112,7 @@ class RegisterFragment : Fragment() {
                     startActivity(Intent(requireActivity(), MainActivity::class.java))
                     requireActivity().finish()
                     addUserToFirebaseDatabase(name, email)
+                    uploadProfilePicture(profile)
                     prefManager.saveUser(email)
                 }else{
                     Toast.makeText(context, "Registration Failed! try again", Toast.LENGTH_SHORT).show()
@@ -106,11 +121,19 @@ class RegisterFragment : Fragment() {
             }
     }
 
+    private fun uploadProfilePicture(profile: Uri?) {
+        if (profile != null){
+            val ref = firebaseStorage.reference.child("profileImage")
+            ref.putFile(profile)
+                .addOnSuccessListener { Log.d("tag", "success") }
+                .addOnFailureListener {   Log.d("tag", "failed") }
+        }
+    }
+
     private fun addUserToFirebaseDatabase(name: String, email: String) {
         uid = firebaseAuth.currentUser?.uid.toString()
         val user = User(name,email,uid)
         firebaseDb.child("user").child(uid).setValue(user)
-
     }
 
     private fun validCredential(): Boolean {
@@ -137,9 +160,10 @@ class RegisterFragment : Fragment() {
             binding.etConPass.error = "Password does not matched"
             binding.etConPass.requestFocus()
             return false
+        }else if (!profileImage){
+            Toast.makeText(context, "Please upload image", Toast.LENGTH_SHORT).show()
+            return false
         }
         return true
     }
-
-
 }

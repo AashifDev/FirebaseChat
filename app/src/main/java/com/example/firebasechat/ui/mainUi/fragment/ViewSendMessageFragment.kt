@@ -56,7 +56,6 @@ class ViewSendMessageFragment : Fragment() {
         msgList = ArrayList()
         adapter = MessageAdapter(requireContext(),msgList)
 
-
         senderUid = FirebaseAuth.getInstance().currentUser?.uid.toString()
 
         senderRoom = receiverUid + senderUid
@@ -65,7 +64,6 @@ class ViewSendMessageFragment : Fragment() {
         binding.send.setOnClickListener {
             sendMessage()
         }
-
 
         setDataToRecyclerView()
 
