@@ -9,7 +9,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -20,7 +22,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraint_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -30,23 +32,23 @@
                 <LinearLayout
                     android:id="@+id/linear_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:orientation="vertical"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
 
-                   <de.hdodenhof.circleimageview.CircleImageView
-                       android:id="@+id/profile"
-                       android:layout_width="96dp"
-                       android:layout_height="96dp"
-                       android:layout_margin="16dp"
-                       android:layout_gravity="center"
-                       app:civ_border_color="@color/blue"
-                       android:src="@drawable/person"
-                       app:layout_constraintStart_toStartOf="@id/text"
-                       app:layout_constraintTop_toBottomOf="@id/text"/>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/profile"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:layout_margin="16dp"
+                        android:layout_gravity="center"
+                        app:civ_border_color="@color/blue"
+                        android:src="@drawable/person"
+                        app:layout_constraintStart_toStartOf="@id/text"
+                        app:layout_constraintTop_toBottomOf="@id/text"/>
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
@@ -62,7 +64,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:hint="@string/name">
+                        android:hint="@string/name"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/error_red">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_name"
@@ -80,6 +84,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/error_red"
                         android:hint="@string/email_address">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -98,6 +104,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/error_red"
                         android:hint="@string/password"
                         app:passwordToggleEnabled="true">
 
@@ -115,6 +123,8 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:helperTextEnabled="true"
+                        app:helperTextTextColor="@color/error_red"
                         android:hint="@string/confirm_password"
                         android:layout_marginTop="20dp">
 
@@ -135,8 +145,8 @@
                         android:background="@drawable/btn_background"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/linear_layout">

@@ -13,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authentication.AuthenticationActivity
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             when(it.itemId){
                 R.id.logout->{
                     firebaseAuth.signOut()
-                    prefManager.clear()
+                    Utils.clear(this)
                     progressBar.visibility = View.VISIBLE
                     startActivity(Intent(this, AuthenticationActivity::class.java))
                     finish()
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         if (current != null){
             current.delete()
             firebaseDb.child("user").child(firebaseAuth.currentUser?.uid!!).removeValue()
-            prefManager.clear()
+            Utils.clear(this)
             startActivity(Intent(this, AuthenticationActivity::class.java))
             finish()
         }

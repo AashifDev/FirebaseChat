@@ -15,9 +15,9 @@ import com.example.firebasechat.R
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authentication.AuthenticationActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.utils.ApplicationContext
 
 class SplashFragment : Fragment() {
-    lateinit var prefManager: PrefManager
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,22 +25,32 @@ class SplashFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_splash, container, false)
-        prefManager = PrefManager(requireContext())
-        val currentUser = prefManager.getUser()
-
-        /*if (!currentUser.isNullOrEmpty()){
-            startActivity(Intent(requireActivity(), MainActivity::class.java))
-            requireActivity().finish()
-        }else{
-            startActivity(Intent(requireActivity(), AuthenticationActivity::class.java))
-            requireActivity().finish()
-        }*/
-
-        Handler(Looper.getMainLooper()).postDelayed(Runnable{
-            findNavController().navigate(R.id.action_splashFragment_to_agreeContinueFragment)
-        },2000)
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val currentUserEmail = PrefManager.getUserEmail()
+        val currentUserNumber = PrefManager.getUserNumber()
+
+        if (!currentUserEmail.isNullOrEmpty()){
+            Handler(Looper.getMainLooper()).postDelayed(Runnable{
+                startActivity(Intent(ApplicationContext.context(), MainActivity::class.java))
+                requireActivity().finish()
+            },2000)
+        }else if (currentUserNumber == null){
+            Handler(Looper.getMainLooper()).postDelayed(Runnable{
+                startActivity(Intent(ApplicationContext.context(), AuthenticationActivity::class.java))
+                requireActivity().finish()
+            },2000)
+        }else{
+            Handler(Looper.getMainLooper()).postDelayed(Runnable{
+                findNavController().navigate(R.id.action_splashFragment_to_agreeContinueFragment)
+            },2000)
+        }
+
     }
 
 }

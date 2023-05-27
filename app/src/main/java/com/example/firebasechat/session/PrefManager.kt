@@ -2,23 +2,32 @@ package com.example.firebasechat.session
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.Utils
 
-class PrefManager( context: Context) {
+class PrefManager(var context: Context) {
 
     val pref: SharedPreferences? = context.getSharedPreferences("ChitChatSharedPreferences", Context.MODE_PRIVATE)
     val edit: SharedPreferences.Editor? = pref?.edit()
 
-    fun saveUser(email:String){
-        edit?.putString("email",email)
-        edit?.commit()
+    companion object{
+
+        fun saveUserWithEmail(email:String){
+            Utils.putString(ApplicationContext.context(),"email",email)
+        }
+
+        fun saveUserWithNumber(number:String){
+           Utils.putInt(ApplicationContext.context(), number,number.toInt())
+        }
+
+        fun getUserEmail():String?{
+            return Utils.getString(ApplicationContext.context(),"email","")
+        }
+
+        fun getUserNumber(): Int {
+            return Utils.getInt(ApplicationContext.context(),"number",0)
+        }
+
     }
 
-    fun getUser():String?{
-        return pref?.getString("email","")
-    }
-
-    fun clear(){
-        edit?.clear()
-        edit?.commit()
-    }
 }

@@ -20,7 +20,6 @@ import com.google.firebase.ktx.app
 class LoginFragment : Fragment() {
     lateinit var binding: FragmentLoginBinding
     lateinit var firebaseAuth: FirebaseAuth
-    lateinit var prefManager: PrefManager
     private var email = ""
     var password = ""
     override fun onCreateView(
@@ -30,7 +29,6 @@ class LoginFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
         firebaseAuth = FirebaseAuth.getInstance()
-        prefManager = PrefManager(requireContext())
 
         return binding.root
     }
@@ -67,7 +65,7 @@ class LoginFragment : Fragment() {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (it.isSuccessful){
-                    prefManager.saveUser(email)
+                    PrefManager.saveUserWithEmail(email)
                     Toast.makeText(context, "Successfully Login", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
                     startActivity(Intent(context,MainActivity::class.java))

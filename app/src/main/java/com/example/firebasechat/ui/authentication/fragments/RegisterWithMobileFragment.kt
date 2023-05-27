@@ -2,6 +2,7 @@ package com.example.firebasechat.ui.authentication.fragments
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -11,11 +12,14 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterWithMobileBinding
 import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -56,6 +60,7 @@ class RegisterWithMobileFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         showKeyboardOnFragmentStart()
 
@@ -64,6 +69,7 @@ class RegisterWithMobileFragment : Fragment() {
                 binding.inputLayoutOtp.visibility = View.VISIBLE
                 binding.textViewSubmit.visibility = View.VISIBLE
                 binding.progressBarNext.visibility = View.VISIBLE
+                binding.inputLayoutMobileNumber.isEnabled = false
                 binding.textViewNext.alpha = .5f
                 val countryCode = "+91"+binding.editTextMobileNumber.text.toString()
                 sendVerificationOtp(countryCode)
@@ -109,11 +115,11 @@ class RegisterWithMobileFragment : Fragment() {
             override fun onVerificationFailed(e: FirebaseException) {
                 Log.w("TAG", "onVerificationFailed", e)
                 if (e is FirebaseAuthInvalidCredentialsException) {
-                    println("Invalid request")
+                    Utils.createToast(ApplicationContext.context(),"Invalid request")
                 } else if (e is FirebaseTooManyRequestsException) {
-                    println("The SMS quota for the project has been exceeded")
+                    Utils.createToast(ApplicationContext.context(),"The SMS quota for the project has been exceeded")
                 } else if (e is FirebaseAuthMissingActivityForRecaptchaException) {
-                    println("reCAPTCHA verification attempted with null Activity")
+                    Utils.createToast(ApplicationContext.context(),"reCAPTCHA verification attempted with null Activity")
                 }
             }
         }
@@ -129,8 +135,16 @@ class RegisterWithMobileFragment : Fragment() {
     }
 
     private fun verifyOtp(code: String) {
-        val credential = PhoneAuthProvider.getCredential(verificationId,code)
-        signInWithCredential(credential)
+        val otp = binding.editTextOtp.text.toString()
+        if (code != otp){
+            val credential = PhoneAuthProvider.getCredential(verificationId,code)
+            signInWithCredential(credential)
+        }else{
+            binding.progressBarSubmit.visibility = View.GONE
+            binding.textViewSubmit.alpha = 1f
+            Utils.createToast(ApplicationContext.context(),"Entered otp is invalid")
+        }
+
     }
 
     private fun signInWithCredential(credential: PhoneAuthCredential) {
@@ -143,6 +157,9 @@ class RegisterWithMobileFragment : Fragment() {
                     }
                     findNavController().navigate(R.id.action_registerWithMobileFragment_to_addProfileFragment,bundle)
                 }
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
             }
     }
 

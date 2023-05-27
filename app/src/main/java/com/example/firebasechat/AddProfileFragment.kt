@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,10 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.firebasechat.databinding.FragmentAddProfileBinding
 import com.example.firebasechat.model.User
+import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -120,13 +124,19 @@ class AddProfileFragment : Fragment() {
             val user = User(userName,null,uid,verificationId)
             firebaseDb.child("user").child(uid).setValue(user)
 
+            val number = firebaseAuth.currentUser?.phoneNumber
+            if (number != null) {
+                PrefManager.saveUserWithNumber(number)
+            }
+
             startActivity(Intent(requireActivity(), MainActivity::class.java))
             requireActivity().finish()
-            Toast.makeText(requireContext(), "Registration completed", Toast.LENGTH_SHORT)
-                .show()
+
+            Utils.createToast(ApplicationContext.context(),"Registration completed")
         }else{
-            Toast.makeText(requireContext(), "Please upload profile image", Toast.LENGTH_SHORT)
-                .show()
+            binding.progressBarSave.visibility = View.GONE
+            binding.textViewSave.alpha = 0f
+            Utils.createToast(ApplicationContext.context(),"Please upload profile image")
         }
     }
 }

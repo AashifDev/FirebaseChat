@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,11 +18,14 @@ import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.internal.Util
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
 import java.util.UUID
@@ -31,7 +35,6 @@ class RegisterFragment : Fragment() {
     lateinit var binding: FragmentRegisterBinding
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var firebaseDb: DatabaseReference
-    lateinit var prefManager: PrefManager
     lateinit var firebaseStorage: FirebaseStorage
 
     val REQUEST_CODE = 101
@@ -52,7 +55,6 @@ class RegisterFragment : Fragment() {
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
         firebaseStorage = Firebase.storage
-        prefManager = PrefManager(requireContext())
 
         binding.profile.setOnClickListener {
             addProfileImage()
@@ -100,6 +102,7 @@ class RegisterFragment : Fragment() {
             if (validCredential()){
                 setRegister()
                 binding.progressCircular.visibility = View.VISIBLE
+                binding.btnRegister.alpha = .7f
             }
         }
     }
@@ -114,7 +117,8 @@ class RegisterFragment : Fragment() {
                     requireActivity().finish()
                     addUserToFirebaseDatabase(name, email)
                     uploadProfilePicture(profile)
-                    prefManager.saveUser(email)
+                    PrefManager.saveUserWithEmail(email)
+                    binding.btnRegister.alpha = 1f
                 }else{
                     Toast.makeText(context, "Registration Failed! try again", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
@@ -142,27 +146,23 @@ class RegisterFragment : Fragment() {
         email = binding.etEmail.text.toString().trim()
         pass = binding.etPass.text.toString().trim()
         conPass = binding.etConPass.text.toString().trim()
-        if (name.isEmpty() && name==""){
-            binding.etName.error = "Name is blank"
-            binding.etName.requestFocus()
+        if (TextUtils.isEmpty(name) && name==""){
+            binding.llName.helperText = "Name is blank"
             return false
-        }else if (email.isEmpty() && email ==""){
-            binding.etEmail.error = "Email address is blank"
-            binding.etEmail.requestFocus()
+        }else if (TextUtils.isEmpty(email) && email ==""){
+            binding.llEmail.helperText = "Email address is blank"
             return false
-        }else if (pass.isEmpty() && pass == "" ){
-            binding.etPass.error = "Password is blank"
-            binding.etPass.requestFocus()
+        }else if (TextUtils.isEmpty(pass) && pass == "" ){
+            binding.llPass.helperText = "Password is blank"
             return false
         }else if (pass.length < 6){
-            Toast.makeText(context, "Minimum 6 character required", Toast.LENGTH_SHORT).show()
+            Utils.createToast(ApplicationContext.context(),"Minimum 6 character required")
             return false
         }else if (conPass != pass) {
-            binding.etConPass.error = "Password does not matched"
-            binding.etConPass.requestFocus()
+            binding.llConPass.helperText = "Password does not matched"
             return false
         }else if (!profileImage){
-            Toast.makeText(context, "Please upload image", Toast.LENGTH_SHORT).show()
+            Utils.createToast(ApplicationContext.context(),"Please upload image")
             return false
         }
         return true
