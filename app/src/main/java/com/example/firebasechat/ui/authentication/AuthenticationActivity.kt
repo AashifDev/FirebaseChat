@@ -2,6 +2,7 @@ package com.example.firebasechat.ui.authentication
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -22,6 +23,13 @@ class AuthenticationActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.authenticationNavHostFragment) as NavHostFragment
         navController = navHostFragment.navController
         toolbar.setupWithNavController(navController)
+
+        toolbar.setOnMenuItemClickListener {
+            if (it.itemId == R.id.email){
+                navController.navigate(R.id.registerFragment)
+            }
+            true
+        }
 
     }
 

@@ -1,5 +1,19 @@
 <resources>
-    <string name="app_name">FirebaseChat</string>
+    <string name="app_name">ChitChat</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="please_enter_mobile_number">Please Enter Mobile Number</string>
+    <string name="welcome_to_chitchat">Welcome to ChitChat</string>
+    <string name="read_our_privacy_policy_tap_agree_and_continue_to_accept_the_terms_of_service">Read our <b><font color="#5DF8B9">Privacy Policy</font></b>. Tap "Agree and Continue" to \n accept the <b><font color="#5DF8B9">Terms of Service</font></b></string>
+    <string name="agree_and_continue">Agree and Continue</string>
+    <string name="register_with_email">Register with Email</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="chitchat_will_need_to_verify_your_account_whats_s_my_number">ChitChat will need to verify your account.<b><font color="#5DF8B9">What\'s my number?</font></b></string>
+    <string name="name">Name</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="next">Next</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="save">Save</string>
 </resources>

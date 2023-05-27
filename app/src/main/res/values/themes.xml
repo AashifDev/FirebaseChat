@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.FirebaseChat" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-         <item name="colorPrimary">@color/blue</item>
+         <item name="colorPrimary">@color/primary</item>
     </style>
 
     <style name="Theme.FirebaseChat" parent="Base.Theme.FirebaseChat" />
@@ -10,6 +10,6 @@
 
     //Progress Bar
     <style name="progress_bar_theme">
-        <item name="colorSecondary">@color/white</item>
+        <item name="colorSecondary">@color/primary</item>
     </style>
 </resources>

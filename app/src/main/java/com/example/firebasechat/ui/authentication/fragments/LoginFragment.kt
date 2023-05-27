@@ -45,7 +45,6 @@ class LoginFragment : Fragment() {
             }
         }
 
-        binding.register.setOnClickListener { findNavController().navigate(R.id.registerFragment) }
     }
 
     private fun validCredential(): Boolean {

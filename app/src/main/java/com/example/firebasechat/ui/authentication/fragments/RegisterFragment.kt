@@ -24,6 +24,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 class RegisterFragment : Fragment() {
 
@@ -50,7 +51,7 @@ class RegisterFragment : Fragment() {
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
-        firebaseStorage = FirebaseStorage.getInstance()
+        firebaseStorage = Firebase.storage
         prefManager = PrefManager(requireContext())
 
         binding.profile.setOnClickListener {
@@ -82,8 +83,8 @@ class RegisterFragment : Fragment() {
                 val bitmapImage = data!!.extras!!.get("data") as Bitmap
                 bitmapImage.compress(Bitmap.CompressFormat.JPEG,100, byte)
                 val uriImg = MediaStore.Images.Media.insertImage(context?.contentResolver,bitmapImage,"image",null)
-                val uri = Uri.parse(uriImg)
-                binding.profile.setImageURI(uri)
+                profile = Uri.parse(uriImg)
+                binding.profile.setImageURI(profile)
                 profileImage = true
             }
             catch (e: Exception){
@@ -123,7 +124,7 @@ class RegisterFragment : Fragment() {
 
     private fun uploadProfilePicture(profile: Uri?) {
         if (profile != null){
-            val ref = firebaseStorage.reference.child("profileImage")
+            val ref = firebaseStorage.reference.child("profileImages/"+firebaseAuth.currentUser?.email)
             ref.putFile(profile)
                 .addOnSuccessListener { Log.d("tag", "success") }
                 .addOnFailureListener {   Log.d("tag", "failed") }
@@ -132,7 +133,7 @@ class RegisterFragment : Fragment() {
 
     private fun addUserToFirebaseDatabase(name: String, email: String) {
         uid = firebaseAuth.currentUser?.uid.toString()
-        val user = User(name,email,uid)
+        val user = User(name,email,uid,null)
         firebaseDb.child("user").child(uid).setValue(user)
     }
 

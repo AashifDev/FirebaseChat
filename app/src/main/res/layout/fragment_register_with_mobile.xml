@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.authentication.fragments.RegisterWithMobileFragment">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="@string/chitchat_will_need_to_verify_your_account_whats_s_my_number"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/inputLayoutMobileNumber"
+        app:layout_constraintStart_toStartOf="@+id/inputLayoutMobileNumber"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputLayoutMobileNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:hint="@string/mobile_number"
+        app:helperTextEnabled="true"
+        app:helperTextTextColor="@color/error_red"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextMobileNumber"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="number"
+            android:textSize="12sp"
+            android:maxLength="10"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputLayoutOtp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:hint="OTP"
+        app:helperTextEnabled="true"
+        app:helperTextTextColor="@color/error_red"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputLayoutMobileNumber">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextOtp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="number"
+            android:textSize="12sp"
+            android:maxLength="10"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textViewNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_next"
+        android:text="@string/next"
+        android:textColor="@color/white"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@+id/inputLayoutMobileNumber"
+        app:layout_constraintTop_toBottomOf="@+id/inputLayoutOtp" />
+
+    <ProgressBar
+        android:id="@+id/progressBarNext"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewNext"
+        app:layout_constraintEnd_toEndOf="@+id/textViewNext"
+        app:layout_constraintStart_toStartOf="@+id/textViewNext"
+        app:layout_constraintTop_toTopOf="@+id/textViewNext" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textViewSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_next"
+        android:text="Submit"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/inputLayoutMobileNumber"
+        app:layout_constraintTop_toBottomOf="@+id/inputLayoutOtp" />
+
+    <ProgressBar
+        android:id="@+id/progressBarSubmit"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewSubmit"
+        app:layout_constraintEnd_toEndOf="@+id/textViewSubmit"
+        app:layout_constraintStart_toStartOf="@+id/textViewSubmit"
+        app:layout_constraintTop_toTopOf="@+id/textViewSubmit" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
