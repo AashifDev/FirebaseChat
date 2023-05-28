@@ -29,6 +29,7 @@ class LoginFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
         firebaseAuth = FirebaseAuth.getInstance()
+        binding.progressCircular.visibility = View.GONE
 
         return binding.root
     }
@@ -40,6 +41,7 @@ class LoginFragment : Fragment() {
             if (validCredential()){
                 setLogin()
                 binding.progressCircular.visibility = View.VISIBLE
+                binding.btnLogin.alpha = .5f
             }
         }
 
@@ -67,7 +69,8 @@ class LoginFragment : Fragment() {
                 if (it.isSuccessful){
                     PrefManager.saveUserWithEmail(email)
                     Toast.makeText(context, "Successfully Login", Toast.LENGTH_SHORT).show()
-                    binding.progressCircular.visibility = View.GONE
+                    binding.progressCircular.visibility = View.VISIBLE
+                    binding.btnLogin.alpha = 1f
                     startActivity(Intent(context,MainActivity::class.java))
                     requireActivity().finish()
                 }else{

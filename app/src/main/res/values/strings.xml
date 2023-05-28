@@ -16,4 +16,6 @@
     <string name="next">Next</string>
     <string name="mobile_number">Mobile Number</string>
     <string name="save">Save</string>
+    <string name="register_with_phone">Register with Phone</string>
+    <string name="login_here_with_email">Login here with <b><font color="#5DF8B9">Email</font></b></string>
 </resources>

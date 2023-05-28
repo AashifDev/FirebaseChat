@@ -16,6 +16,7 @@ import com.example.firebasechat.databinding.FragmentHomeBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.ui.authentication.AuthenticationActivity
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
+import com.example.firebasechat.utils.ApplicationContext
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -84,6 +85,15 @@ class HomeFragment : Fragment() {
             }
 
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = firebaseAuth.currentUser?.uid
+        if (!currentUser.isNullOrEmpty()){
+            startActivity(Intent(ApplicationContext.context(), AuthenticationActivity::class.java))
+            requireActivity().finish()
+        }
     }
 
 

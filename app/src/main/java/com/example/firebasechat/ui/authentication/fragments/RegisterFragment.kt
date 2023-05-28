@@ -14,9 +14,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
+import com.example.firebasechat.ui.authentication.AuthenticationActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.utils.ApplicationContext
 import com.example.firebasechat.utils.Utils
@@ -45,6 +48,7 @@ class RegisterFragment : Fragment() {
     var uid = ""
     var profile: Uri? = null
     var profileImage:Boolean = false
+    var registerWith = "Register with email"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,7 +63,26 @@ class RegisterFragment : Fragment() {
         binding.profile.setOnClickListener {
             addProfileImage()
         }
+
+        (requireActivity() as AuthenticationActivity).toolbar.setOnMenuItemClickListener {
+            if (it.itemId == R.id.emailOrPhone){
+                findNavController().navigate(R.id.action_registerFragment_to_registerWithMobileFragment)
+            }
+            it.title = registerWith
+            true
+        }
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.btnRegister.setOnClickListener {
+            if (validCredential()){
+                setRegister()
+                binding.progressCircular.visibility = View.VISIBLE
+                binding.btnRegister.alpha = .7f
+            }
+        }
     }
 
     private fun addProfileImage() {
@@ -96,17 +119,6 @@ class RegisterFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.btnRegister.setOnClickListener {
-            if (validCredential()){
-                setRegister()
-                binding.progressCircular.visibility = View.VISIBLE
-                binding.btnRegister.alpha = .7f
-            }
-        }
-    }
-
     private fun setRegister() {
         firebaseAuth.createUserWithEmailAndPassword(email,pass)
             .addOnCompleteListener {
@@ -128,7 +140,7 @@ class RegisterFragment : Fragment() {
 
     private fun uploadProfilePicture(profile: Uri?) {
         if (profile != null){
-            val ref = firebaseStorage.reference.child("profileImages/"+firebaseAuth.currentUser?.email)
+            val ref = firebaseStorage.reference.child("profileImageEmailUser/"+firebaseAuth.currentUser?.email)
             ref.putFile(profile)
                 .addOnSuccessListener { Log.d("tag", "success") }
                 .addOnFailureListener {   Log.d("tag", "failed") }

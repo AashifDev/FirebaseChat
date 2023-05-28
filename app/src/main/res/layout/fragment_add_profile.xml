@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".AddProfileFragment">
+    tools:context=".ui.authentication.fragments.AddProfileFragment">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile"
