@@ -1,9 +1,7 @@
-package com.example.firebasechat.ui.authentication.fragments
+package com.example.firebasechat.ui.authWithMobile.fragment
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Paint.Align
-import android.icu.text.CaseMap.Title
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -19,8 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterWithMobileBinding
-import com.example.firebasechat.ui.authentication.AuthenticationActivity
-import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.ui.authWithEmail.AuthEmailActivity
 import com.example.firebasechat.utils.ApplicationContext
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.FirebaseException
@@ -34,7 +31,6 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import java.time.format.TextStyle
 import java.util.concurrent.TimeUnit
 
 
@@ -62,13 +58,6 @@ class RegisterWithMobileFragment : Fragment() {
         binding.progressBarNext.visibility = View.GONE
         binding.progressBarSubmit.visibility = View.GONE
 
-        (requireActivity() as AuthenticationActivity).toolbar.setOnMenuItemClickListener {
-            if (it.itemId == R.id.emailOrPhone){
-                findNavController().navigate(R.id.action_registerWithMobileFragment_to_registerFragment)
-            }
-            it.title = registerWith
-            true
-        }
 
         return binding.root
     }
@@ -97,7 +86,9 @@ class RegisterWithMobileFragment : Fragment() {
             }
         }
 
-        binding.textViewLoginWithEmail.setOnClickListener { findNavController().navigate(R.id.loginFragment) }
+        binding.textViewRegisterWithEmail.setOnClickListener {
+            startActivity(Intent(ApplicationContext.context(), AuthEmailActivity::class.java))
+        }
     }
 
     private fun validOtp(): Boolean {
@@ -170,7 +161,7 @@ class RegisterWithMobileFragment : Fragment() {
                         putString("uid",firebaseAuth.currentUser?.uid.toString())
                         putString("verificationId", verificationId)
                     }
-                    findNavController().navigate(R.id.action_registerWithMobileFragment_to_addProfileFragment,bundle)
+                    findNavController().navigate(R.id.addProfileFragment,bundle)
                 }
             }
             .addOnFailureListener {

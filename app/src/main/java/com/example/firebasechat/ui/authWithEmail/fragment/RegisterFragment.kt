@@ -1,4 +1,4 @@
-package com.example.firebasechat.ui.authentication.fragments
+package com.example.firebasechat.ui.authWithEmail.fragment
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,6 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
-import com.example.firebasechat.ui.authentication.AuthenticationActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.utils.ApplicationContext
 import com.example.firebasechat.utils.Utils
@@ -28,10 +26,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.internal.Util
 import com.google.firebase.storage.ktx.storage
-import java.io.ByteArrayOutputStream
-import java.util.UUID
 
 class RegisterFragment : Fragment() {
 
@@ -46,6 +41,7 @@ class RegisterFragment : Fragment() {
     var conPass = ""
     var name = ""
     var uid = ""
+    var mobileNumber = ""
     var profile: Uri? = null
     var profileImage:Boolean = false
     var registerWith = "Register with email"
@@ -60,22 +56,20 @@ class RegisterFragment : Fragment() {
         firebaseDb = Firebase.database.reference
         firebaseStorage = Firebase.storage
 
-        binding.profile.setOnClickListener {
-            addProfileImage()
-        }
 
-        (requireActivity() as AuthenticationActivity).toolbar.setOnMenuItemClickListener {
-            if (it.itemId == R.id.emailOrPhone){
-                findNavController().navigate(R.id.action_registerFragment_to_registerWithMobileFragment)
-            }
-            it.title = registerWith
-            true
-        }
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.profile.setOnClickListener {
+            addProfileImage()
+        }
+
+        binding.textViewLoginWithEmail.setOnClickListener { findNavController().navigate(R.id.loginFragment) }
+
         binding.btnRegister.setOnClickListener {
             if (validCredential()){
                 setRegister()
@@ -102,13 +96,9 @@ class RegisterFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE){
-            //profile = data!!.extras!!.get("data") as Uri?
             try {
-                val byte = ByteArrayOutputStream()
-                val bitmapImage = data!!.extras!!.get("data") as Bitmap
-                bitmapImage.compress(Bitmap.CompressFormat.JPEG,100, byte)
-                val uriImg = MediaStore.Images.Media.insertImage(context?.contentResolver,bitmapImage,"image",null)
-                profile = Uri.parse(uriImg)
+                val bitmap = data!!.extras!!.get("data") as Bitmap
+                profile =  Utils.getUriFromFile(requireContext(),bitmap)
                 binding.profile.setImageURI(profile)
                 profileImage = true
             }
@@ -127,8 +117,8 @@ class RegisterFragment : Fragment() {
                     binding.progressCircular.visibility = View.GONE
                     startActivity(Intent(requireActivity(), MainActivity::class.java))
                     requireActivity().finish()
-                    addUserToFirebaseDatabase(name, email)
-                    uploadProfilePicture(profile)
+                    addUserToFirebaseDatabase(name, email,profile,mobileNumber)
+                    //uploadProfilePicture(profile)
                     PrefManager.saveUserWithEmail(email)
                     binding.btnRegister.alpha = 1f
                 }else{
@@ -142,15 +132,25 @@ class RegisterFragment : Fragment() {
         if (profile != null){
             val ref = firebaseStorage.reference.child("profileImageEmailUser/"+firebaseAuth.currentUser?.email)
             ref.putFile(profile)
-                .addOnSuccessListener { Log.d("tag", "success") }
-                .addOnFailureListener {   Log.d("tag", "failed") }
         }
     }
 
-    private fun addUserToFirebaseDatabase(name: String, email: String) {
-        uid = firebaseAuth.currentUser?.uid.toString()
-        val user = User(name,email,uid,null)
-        firebaseDb.child("user").child(uid).setValue(user)
+    private fun addUserToFirebaseDatabase(
+        name: String,
+        email: String,
+        profile: Uri?,
+        mobileNumber: String?
+    ) {
+
+        if (profile != null){
+            uid = firebaseAuth.currentUser?.uid.toString()
+            val ref = firebaseStorage.reference.child("profileImageEmailUser/"+firebaseAuth.currentUser?.email)
+            ref.putFile(profile)
+            val user = User(name,email, uid,mobileNumber,profile.toString())
+            firebaseDb.child("user").child(this.uid).setValue(user)
+        }
+
+
     }
 
     private fun validCredential(): Boolean {

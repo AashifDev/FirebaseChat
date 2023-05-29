@@ -5,15 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.session.PrefManager
-import com.example.firebasechat.ui.authentication.AuthenticationActivity
+import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.utils.ApplicationContext
 
@@ -42,7 +41,7 @@ class SplashFragment : Fragment() {
             },2000)
         }else if (currentUserNumber == null){
             Handler(Looper.getMainLooper()).postDelayed(Runnable{
-                startActivity(Intent(ApplicationContext.context(), AuthenticationActivity::class.java))
+                startActivity(Intent(ApplicationContext.context(), AuthMobileActivity::class.java))
                 requireActivity().finish()
             },2000)
         }else{

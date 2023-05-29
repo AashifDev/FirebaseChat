@@ -1,5 +1,6 @@
 package com.example.firebasechat.ui.mainUi.fragment
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,10 +9,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewSendMessageBinding
 import com.example.firebasechat.model.Message
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.MessageAdapter
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,6 +23,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import java.net.URI
 
 class ViewSendMessageFragment : Fragment() {
     lateinit var binding: FragmentViewSendMessageBinding
@@ -31,6 +36,7 @@ class ViewSendMessageFragment : Fragment() {
     var receiverRoom:String? = null
 
     var userName = ""
+    var pic = ""
     var receiverUid = ""
     var message = ""
     var senderUid = ""
@@ -43,8 +49,17 @@ class ViewSendMessageFragment : Fragment() {
 
         userName = arguments?.getString("userName").toString()
         receiverUid = arguments?.getString("uid").toString()
+        pic = arguments?.getString("pic").toString()
 
-        (requireActivity() as MainActivity).toolbar.title = userName
+        val image = Uri.parse(pic)
+
+
+        (requireActivity() as MainActivity).binding.toolbar.userName.text = userName
+        (requireActivity() as MainActivity).binding.toolbar.profileImage.setImageURI(image)
+        (requireActivity() as MainActivity).binding.toolbar.back.setOnClickListener {
+            findNavController().navigate(R.id.homeFragment)
+        }
+
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
 
@@ -103,5 +118,19 @@ class ViewSendMessageFragment : Fragment() {
     }
 
 
+    override fun onStart() {
+        super.onStart()
+        (requireActivity() as MainActivity).showToolbarItem()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (requireActivity() as MainActivity).hideToolbarItem()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (requireActivity() as MainActivity).hideToolbarItem()
+    }
 
 }

@@ -6,7 +6,7 @@
     <string name="welcome_to_chitchat">Welcome to ChitChat</string>
     <string name="read_our_privacy_policy_tap_agree_and_continue_to_accept_the_terms_of_service">Read our <b><font color="#5DF8B9">Privacy Policy</font></b>. Tap "Agree and Continue" to \n accept the <b><font color="#5DF8B9">Terms of Service</font></b></string>
     <string name="agree_and_continue">Agree and Continue</string>
-    <string name="register_with_email">Register with Email</string>
+    <string name="register_with_email">Register with <b><font color="#5DF8B9">Email</font></b></string>
     <string name="profile_image">Profile Image</string>
     <string name="chitchat_will_need_to_verify_your_account_whats_s_my_number">ChitChat will need to verify your account.<b><font color="#5DF8B9">What\'s my number?</font></b></string>
     <string name="name">Name</string>
@@ -18,4 +18,5 @@
     <string name="save">Save</string>
     <string name="register_with_phone">Register with Phone</string>
     <string name="login_here_with_email">Login here with <b><font color="#5DF8B9">Email</font></b></string>
+    <string name="already_registered_signin_now">Already Registered <b><font color="#5DF8B9">SignIn Now</font></b></string>
 </resources>

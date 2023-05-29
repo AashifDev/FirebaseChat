@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/auth_mobile_nav_graph"
+    app:startDestination="@id/registerWithMobileFragment">
+
+    <fragment
+        android:id="@+id/registerWithMobileFragment"
+        android:name="com.example.firebasechat.ui.authWithMobile.fragment.RegisterWithMobileFragment"
+        android:label="fragment_register_with_mobile"
+        tools:layout="@layout/fragment_register_with_mobile" />
+    <fragment
+        android:id="@+id/addProfileFragment"
+        android:name="com.example.firebasechat.ui.authWithMobile.fragment.AddProfileFragment"
+        android:label="fragment_add_profile"
+        tools:layout="@layout/fragment_add_profile" />
+</navigation>

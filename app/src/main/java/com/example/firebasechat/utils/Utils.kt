@@ -1,8 +1,14 @@
 package com.example.firebasechat.utils
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.preference.PreferenceManager
+import android.provider.MediaStore
 import android.widget.Toast
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -114,6 +120,26 @@ object Utils {
         }
         return changedTime
     }*/
+
+    fun getImageUriFromBitmap(context: Context?, bitmap: Bitmap?):Uri{
+        val bytes = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG,100, bytes)
+        val path = MediaStore.Images.Media.insertImage(context?.contentResolver,bitmap,"Title",null)
+        return Uri.parse(path)
+    }
+
+    fun getUriFromFile(context: Context?, bitmap: Bitmap):Uri{
+        val tempFile = File.createTempFile("profile", ".png")
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
+        val bitmapData = bytes.toByteArray()
+
+        val fileOutPut = FileOutputStream(tempFile)
+        fileOutPut.write(bitmapData)
+        fileOutPut.flush()
+        fileOutPut.close()
+        return Uri.fromFile(tempFile)
+    }
 }
 
 

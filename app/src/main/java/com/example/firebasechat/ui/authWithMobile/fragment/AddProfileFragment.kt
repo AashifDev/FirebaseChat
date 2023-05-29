@@ -1,4 +1,4 @@
-package com.example.firebasechat.ui.authentication.fragments
+package com.example.firebasechat.ui.authWithMobile.fragment
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -117,8 +117,8 @@ class AddProfileFragment : Fragment() {
             val ref = firebaseStorage.reference.child("profileImagePhoneUser/"+firebaseAuth.currentUser?.phoneNumber)
             ref.putFile(profileImage!!)
 
-            val user = User(userName,null,uid,verificationId)
-            firebaseDb.child("user").child(uid).setValue(user)
+           // val user = User(userName,null,uid,verificationId)
+           // firebaseDb.child("user").child(uid).setValue(user)
 
             val number = firebaseAuth.currentUser?.phoneNumber
             if (number != null) {

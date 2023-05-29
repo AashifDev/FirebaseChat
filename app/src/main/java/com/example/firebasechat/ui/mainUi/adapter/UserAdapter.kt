@@ -8,14 +8,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.model.User
+import de.hdodenhof.circleimageview.CircleImageView
 
 class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val user:TextView = itemView.findViewById(R.id.userName)
-        //val profileImage: CircleImageView = itemView.findViewById(R.id.profile_image)
+        val profileImage: CircleImageView = itemView.findViewById(R.id.profile_image)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,9 +33,11 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : Recyc
             val bundle = Bundle().apply {
                 putString("userName", item.name)
                 putString("uid",item.uid)
+                putString("pic",item.pic)
             }
             holder.user.findNavController().navigate(R.id.action_homeFragment_to_viewSendMessageFragment,bundle)
         }
+        Glide.with(context).load(item.pic).into(holder.profileImage)
     }
 
 }

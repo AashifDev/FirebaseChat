@@ -3,14 +3,13 @@ package com.example.firebasechat.splash.fragment
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.example.firebasechat.R
-import com.example.firebasechat.ui.authentication.AuthenticationActivity
+import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 
 class AgreeContinueFragment : Fragment() {
     lateinit var agreeAndContinue : TextView
@@ -24,7 +23,7 @@ class AgreeContinueFragment : Fragment() {
         agreeAndContinue = view.findViewById(R.id.textViewAgreeAndContinue)
 
         agreeAndContinue.setOnClickListener {
-            startActivity(Intent(requireActivity(), AuthenticationActivity::class.java))
+            startActivity(Intent(requireActivity(), AuthMobileActivity::class.java))
             requireActivity().finish()
         }
         return view

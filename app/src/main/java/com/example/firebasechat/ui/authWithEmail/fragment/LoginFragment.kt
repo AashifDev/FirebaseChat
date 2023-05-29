@@ -1,4 +1,4 @@
-package com.example.firebasechat.ui.authentication.fragments
+package com.example.firebasechat.ui.authWithEmail.fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,8 +13,6 @@ import com.example.firebasechat.databinding.FragmentLoginBinding
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.app
 
 
 class LoginFragment : Fragment() {
@@ -37,6 +35,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.register.setOnClickListener { findNavController().navigate(R.id.registerFragment) }
         binding.btnLogin.setOnClickListener {
             if (validCredential()){
                 setLogin()
