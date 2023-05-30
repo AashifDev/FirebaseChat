@@ -1,6 +1,7 @@
 package com.example.firebasechat.utils
 
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
 import android.preference.PreferenceManager
@@ -12,6 +13,7 @@ import java.io.FileOutputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 object Utils {
     fun getInt(context: Context?, key: String, defaultValue: Int): Int {
@@ -140,6 +142,7 @@ object Utils {
         fileOutPut.close()
         return Uri.fromFile(tempFile)
     }
+
 }
 
 

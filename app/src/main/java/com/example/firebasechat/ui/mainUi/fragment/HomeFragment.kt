@@ -42,6 +42,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         userList = ArrayList()
         adapter = UserAdapter(requireContext(),userList)
+
+
         setUserToRecyclerView()
     }
 

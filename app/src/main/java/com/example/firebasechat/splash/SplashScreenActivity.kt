@@ -34,7 +34,7 @@ class SplashScreenActivity : AppCompatActivity() {
     override fun onRestart() {
         super.onRestart()
         Handler(Looper.getMainLooper()).postDelayed(Runnable{
-            navController.navigate(R.id.action_splashFragment_to_agreeContinueFragment)
+            navController.navigate(R.id.agreeContinueFragment)
         },2000)
     }
 }

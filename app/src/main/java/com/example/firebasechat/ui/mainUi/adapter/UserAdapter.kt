@@ -35,7 +35,7 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : Recyc
                 putString("uid",item.uid)
                 putString("pic",item.pic)
             }
-            holder.user.findNavController().navigate(R.id.action_homeFragment_to_viewSendMessageFragment,bundle)
+            holder.user.findNavController().navigate(R.id.viewSendMessageFragment,bundle)
         }
         Glide.with(context).load(item.pic).into(holder.profileImage)
     }

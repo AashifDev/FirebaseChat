@@ -3,6 +3,7 @@ package com.example.firebasechat.ui.mainUi.fragment
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewSendMessageBinding
 import com.example.firebasechat.model.Message
@@ -36,7 +38,7 @@ class ViewSendMessageFragment : Fragment() {
     var receiverRoom:String? = null
 
     var userName = ""
-    var pic = ""
+    var picUrl = ""
     var receiverUid = ""
     var message = ""
     var senderUid = ""
@@ -49,22 +51,27 @@ class ViewSendMessageFragment : Fragment() {
 
         userName = arguments?.getString("userName").toString()
         receiverUid = arguments?.getString("uid").toString()
-        pic = arguments?.getString("pic").toString()
+        picUrl = arguments?.getString("pic").toString()
 
-        val image = Uri.parse(pic)
+        setNameAndProfilePicOnToolBar()
 
 
-        (requireActivity() as MainActivity).binding.toolbar.userName.text = userName
-        (requireActivity() as MainActivity).binding.toolbar.profileImage.setImageURI(image)
         (requireActivity() as MainActivity).binding.toolbar.back.setOnClickListener {
             findNavController().navigate(R.id.homeFragment)
         }
+        (requireActivity() as MainActivity).binding.toolbar.more.visibility = View.GONE
 
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
 
 
         return binding.root
+    }
+
+    private fun setNameAndProfilePicOnToolBar() {
+        (requireActivity() as MainActivity).binding.toolbar.userName.text = userName
+        val img = (requireActivity() as MainActivity).binding.toolbar.profileImage
+        Glide.with(requireContext()).load(picUrl).into(img)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,11 +84,21 @@ class ViewSendMessageFragment : Fragment() {
         receiverRoom = senderUid + receiverUid
 
         binding.send.setOnClickListener {
-            sendMessage()
+            if (validMessage()){
+                sendMessage()
+            }
         }
 
         setDataToRecyclerView()
 
+    }
+
+    private fun validMessage(): Boolean {
+        message = binding.editTextWriteMessage.text.toString()
+        if (message.isEmpty() && message==""){
+            return false
+        }
+        return true
     }
 
     private fun setDataToRecyclerView() {
@@ -96,18 +113,15 @@ class ViewSendMessageFragment : Fragment() {
                         binding.recyclerViewMessage.adapter = adapter
                     }
                     adapter.notifyDataSetChanged()
-
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("err",error.message)
                 }
-
             })
     }
 
     private fun sendMessage() {
-        message = binding.editTextWriteMessage.text.toString()
         val msg = Message(message,senderUid)
         firebaseDb.child("chats").child(senderRoom!!).child("messages").push()
             .setValue(msg)
@@ -126,11 +140,13 @@ class ViewSendMessageFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.more.visibility = View.VISIBLE
     }
 
     override fun onStop() {
         super.onStop()
         (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.more.visibility = View.VISIBLE
     }
 
 }

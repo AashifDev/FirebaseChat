@@ -19,4 +19,13 @@
     <string name="register_with_phone">Register with Phone</string>
     <string name="login_here_with_email">Login here with <b><font color="#5DF8B9">Email</font></b></string>
     <string name="already_registered_signin_now">Already Registered <b><font color="#5DF8B9">SignIn Now</font></b></string>
+    <string name="account">Account</string>
+    <string name="logout">Logout</string>
+    <string name="new_message">New Message</string>
+
+    //Spinner Array
+    <string-array name="more">
+        <item>Logout</item>
+        <item>Delete Account</item>
+    </string-array>
 </resources>

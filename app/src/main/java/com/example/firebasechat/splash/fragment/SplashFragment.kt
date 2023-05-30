@@ -46,7 +46,7 @@ class SplashFragment : Fragment() {
             },2000)
         }else{
             Handler(Looper.getMainLooper()).postDelayed(Runnable{
-                findNavController().navigate(R.id.action_splashFragment_to_agreeContinueFragment)
+                findNavController().navigate(R.id.agreeContinueFragment)
             },2000)
         }
 

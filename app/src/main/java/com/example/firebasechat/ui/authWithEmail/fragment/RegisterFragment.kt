@@ -1,16 +1,24 @@
 package com.example.firebasechat.ui.authWithEmail.fragment
 
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -26,7 +34,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import java.io.File
 
 class RegisterFragment : Fragment() {
 
@@ -35,16 +45,18 @@ class RegisterFragment : Fragment() {
     lateinit var firebaseDb: DatabaseReference
     lateinit var firebaseStorage: FirebaseStorage
 
-    val REQUEST_CODE = 101
+    val CAMERA_REQ_CODE = 101
+    val GALLERY_REQ_CODE = 102
     var email = ""
     var pass = ""
     var conPass = ""
     var name = ""
     var uid = ""
+    var ref: StorageReference? = null
     var mobileNumber = ""
     var profile: Uri? = null
-    var profileImage:Boolean = false
-    var registerWith = "Register with email"
+    var file: Uri? = null
+    var profileImage: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,17 +73,18 @@ class RegisterFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.profile.setOnClickListener {
-            addProfileImage()
+            uploadImageDialog()
         }
 
         binding.textViewLoginWithEmail.setOnClickListener { findNavController().navigate(R.id.loginFragment) }
 
         binding.btnRegister.setOnClickListener {
-            if (validCredential()){
+            if (validCredential()) {
                 setRegister()
                 binding.progressCircular.visibility = View.VISIBLE
                 binding.btnRegister.alpha = .7f
@@ -79,60 +92,22 @@ class RegisterFragment : Fragment() {
         }
     }
 
-    private fun addProfileImage() {
-        if (ActivityCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(requireActivity(),Array(1){android.Manifest.permission.CAMERA},101)
-        }else{
-            camera()
-        }
-    }
-
-    private fun camera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, REQUEST_CODE)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE){
-            try {
-                val bitmap = data!!.extras!!.get("data") as Bitmap
-                profile =  Utils.getUriFromFile(requireContext(),bitmap)
-                binding.profile.setImageURI(profile)
-                profileImage = true
-            }
-            catch (e: Exception){
-                e.printStackTrace()
-            }
-
-        }
-    }
-
     private fun setRegister() {
-        firebaseAuth.createUserWithEmailAndPassword(email,pass)
+        firebaseAuth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener {
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     Toast.makeText(context, "Successfully Registered", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
-                    startActivity(Intent(requireActivity(), MainActivity::class.java))
+                    startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
-                    addUserToFirebaseDatabase(name, email,profile,mobileNumber)
-                    //uploadProfilePicture(profile)
+                    addUserToFirebaseDatabase(name, email, profile, mobileNumber)
                     PrefManager.saveUserWithEmail(email)
                     binding.btnRegister.alpha = 1f
-                }else{
+                } else {
                     Toast.makeText(context, "Registration Failed! try again", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
                 }
             }
-    }
-
-    private fun uploadProfilePicture(profile: Uri?) {
-        if (profile != null){
-            val ref = firebaseStorage.reference.child("profileImageEmailUser/"+firebaseAuth.currentUser?.email)
-            ref.putFile(profile)
-        }
     }
 
     private fun addUserToFirebaseDatabase(
@@ -141,15 +116,18 @@ class RegisterFragment : Fragment() {
         profile: Uri?,
         mobileNumber: String?
     ) {
-
+        uid = firebaseAuth.currentUser?.uid.toString()
         if (profile != null){
-            uid = firebaseAuth.currentUser?.uid.toString()
-            val ref = firebaseStorage.reference.child("profileImageEmailUser/"+firebaseAuth.currentUser?.email)
+            val ref = firebaseStorage.reference.child("profileImageEmailUser/" + firebaseAuth.currentUser?.email)
             ref.putFile(profile)
-            val user = User(name,email, uid,mobileNumber,profile.toString())
-            firebaseDb.child("user").child(this.uid).setValue(user)
+                .addOnSuccessListener {
+                    ref.downloadUrl.addOnSuccessListener {
+                        val path = it.toString()
+                        val user = User(name, email, uid, mobileNumber, path)
+                        firebaseDb.child("user").child(uid).setValue(user)
+                    }
+                }
         }
-
 
     }
 
@@ -158,25 +136,125 @@ class RegisterFragment : Fragment() {
         email = binding.etEmail.text.toString().trim()
         pass = binding.etPass.text.toString().trim()
         conPass = binding.etConPass.text.toString().trim()
-        if (TextUtils.isEmpty(name) && name==""){
+        if (TextUtils.isEmpty(name) && name == "") {
             binding.llName.helperText = "Name is blank"
             return false
-        }else if (TextUtils.isEmpty(email) && email ==""){
+        } else if (TextUtils.isEmpty(email) && email == "") {
             binding.llEmail.helperText = "Email address is blank"
             return false
-        }else if (TextUtils.isEmpty(pass) && pass == "" ){
+        } else if (TextUtils.isEmpty(pass) && pass == "") {
             binding.llPass.helperText = "Password is blank"
             return false
-        }else if (pass.length < 6){
-            Utils.createToast(ApplicationContext.context(),"Minimum 6 character required")
+        } else if (pass.length < 6) {
+            Utils.createToast(ApplicationContext.context(), "Minimum 6 character required")
             return false
-        }else if (conPass != pass) {
+        } else if (conPass != pass) {
             binding.llConPass.helperText = "Password does not matched"
             return false
-        }else if (!profileImage){
-            Utils.createToast(ApplicationContext.context(),"Please upload image")
+        } else if (!profileImage) {
+            Utils.createToast(ApplicationContext.context(), "Please upload image")
             return false
         }
         return true
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun uploadImageDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.upload_profile_layout)
+
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
+
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        lp.gravity = Gravity.BOTTOM
+
+        dialog.window?.attributes = lp
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        //dialog?.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+
+        val camera = dialog.findViewById(R.id.camera) as ImageView
+        val gallery = dialog.findViewById(R.id.gallery) as ImageView
+
+        camera.setOnClickListener {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(), Array(1) { android.Manifest.permission.CAMERA },
+                    CAMERA_REQ_CODE
+                )
+            } else {
+                openCamera()
+            }
+            dialog.dismiss()
+        }
+
+        gallery.setOnClickListener {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    Array(1) { android.Manifest.permission.READ_EXTERNAL_STORAGE },
+                    GALLERY_REQ_CODE
+                )
+            } else {
+                openGallery()
+            }
+            dialog.dismiss()
+        }
+        dialog.show()
+
+        dialog.setCancelable(true)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun openGallery() {
+        val galleryIntent = Intent()
+        galleryIntent.type = "image/**"
+        galleryIntent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(galleryIntent, GALLERY_REQ_CODE)
+
+    }
+
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(cameraIntent, CAMERA_REQ_CODE)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            CAMERA_REQ_CODE -> {
+                try {
+                    val bitmap = data!!.extras!!.get("data") as Bitmap
+                    profile = Utils.getUriFromFile(requireContext(), bitmap)
+                    binding.profile.setImageURI(profile)
+                    profileImage = true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+            }
+
+            GALLERY_REQ_CODE -> {
+                try {
+                    //val bitmap = MediaStore.Images.Media.getBitmap(context?.contentResolver, profile)
+                    profile = data!!.data
+                    binding.profile.setImageURI(profile)
+                    profileImage = true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 }

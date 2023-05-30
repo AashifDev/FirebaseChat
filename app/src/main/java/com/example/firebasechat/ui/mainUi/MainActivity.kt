@@ -1,20 +1,21 @@
 package com.example.firebasechat.ui.mainUi
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
-import com.example.firebasechat.utils.ApplicationContext
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -44,28 +45,32 @@ class MainActivity : AppCompatActivity() {
        // binding.toolbar.userName.text = "ChitChat"
 
 
-
-
-       /* binding.toolbar.back.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.logout->{
-                    firebaseAuth.signOut()
-                    Utils.clear(this)
-                    progressBar.visibility = View.VISIBLE
-                    startActivity(Intent(this, AuthMobileActivity::class.java))
-                    finish()
-                }
-                R.id.deleteAccound->{
-                    deleteAccount()
-                }
-                else ->{
-                    progressBar.visibility = View.GONE
-                }
-            }
-            true
-        }*/
+        binding.toolbar.more.setOnClickListener {
+            firebaseAuth.signOut()
+            Utils.clear(this)
+            progressBar.visibility = View.VISIBLE
+            startActivity(Intent(this, AuthMobileActivity::class.java))
+            finish()
+        }
 
     }
+
+    private fun openMoreMenuDialog() {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.more_menu_main_activity)
+        val lp = WindowManager.LayoutParams()
+        lp.gravity = Gravity.END
+        val m1 = dialog.findViewById(R.id.logout) as TextView
+        m1.setOnClickListener {
+            firebaseAuth.signOut()
+            Utils.clear(this)
+            progressBar.visibility = View.VISIBLE
+            startActivity(Intent(this, AuthMobileActivity::class.java))
+            finish()
+        }
+        dialog.show()
+    }
+
     private fun deleteAccount() {
         val current = firebaseAuth.currentUser!!
         if (current != null){
@@ -96,6 +101,13 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         hideToolbarItem()
+        val current = firebaseAuth.currentUser?.uid
+        if (current.isNullOrEmpty()){
+            startActivity(Intent(this, AuthMobileActivity::class.java))
+            finish()
+        }else{
+            Utils.createToast(this, "Welcome Back!")
+        }
     }
 
     override fun onRestart() {
@@ -107,4 +119,5 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         hideToolbarItem()
     }
+
 }
