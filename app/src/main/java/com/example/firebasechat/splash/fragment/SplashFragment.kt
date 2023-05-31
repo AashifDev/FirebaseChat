@@ -14,7 +14,7 @@ import com.example.firebasechat.R
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
-import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.App
 
 class SplashFragment : Fragment() {
     @SuppressLint("MissingInflatedId")
@@ -36,12 +36,12 @@ class SplashFragment : Fragment() {
 
         if (!currentUserEmail.isNullOrEmpty()){
             Handler(Looper.getMainLooper()).postDelayed(Runnable{
-                startActivity(Intent(ApplicationContext.context(), MainActivity::class.java))
+                startActivity(Intent(App.context(), MainActivity::class.java))
                 requireActivity().finish()
             },2000)
         }else if (currentUserNumber == null){
             Handler(Looper.getMainLooper()).postDelayed(Runnable{
-                startActivity(Intent(ApplicationContext.context(), AuthMobileActivity::class.java))
+                startActivity(Intent(App.context(), AuthMobileActivity::class.java))
                 requireActivity().finish()
             },2000)
         }else{

@@ -170,8 +170,8 @@
         android:layout_height="wrap_content"
         android:text="@string/already_registered_signin_now"
         android:textColor="@color/black"
-        android:padding="12dp"
-        android:textSize="18sp"
+        android:padding="8dp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

@@ -2,15 +2,15 @@ package com.example.firebasechat.utils
 
 import android.app.Application
 
-class ApplicationContext:Application() {
+class App:Application() {
     init {
         instance = this
     }
 
     companion object {
-        private var instance: ApplicationContext? = null
+        private var instance: App? = null
 
-        fun context() : ApplicationContext? {
+        fun context() : App? {
             return instance
         }
     }

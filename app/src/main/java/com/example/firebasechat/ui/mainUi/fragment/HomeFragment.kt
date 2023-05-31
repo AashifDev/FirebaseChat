@@ -3,12 +3,21 @@ package com.example.firebasechat.ui.mainUi.fragment
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
 import com.example.firebasechat.model.User
+import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
+import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,10 +39,12 @@ class HomeFragment : Fragment() {
 
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
         binding.progressBar.visibility = View.VISIBLE
         binding.noChat.visibility = View.GONE
+
 
         return binding.root
     }
@@ -46,8 +57,6 @@ class HomeFragment : Fragment() {
 
         setUserToRecyclerView()
     }
-
-
 
     private fun setUserToRecyclerView() {
 
@@ -80,14 +89,24 @@ class HomeFragment : Fragment() {
         })
     }
 
-   /* override fun onStart() {
+    override fun onStart() {
         super.onStart()
-        val currentUser = firebaseAuth.currentUser?.uid
-        if (!currentUser.isNullOrEmpty()){
-            startActivity(Intent(ApplicationContext.context(), AuthenticationActivity::class.java))
-            requireActivity().finish()
-        }
-    }*/
+        (requireActivity() as MainActivity).showToolbarItem()
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (requireActivity() as MainActivity).hideToolbarItem()
+
+        //(requireActivity() as MainActivity).binding.toolbar.more.visibility = View.VISIBLE
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).showMenuItem()
+        //(requireActivity() as MainActivity).binding.toolbar.more.visibility = View.VISIBLE
+    }
 
 }

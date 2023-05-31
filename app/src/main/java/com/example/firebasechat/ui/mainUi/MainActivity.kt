@@ -1,15 +1,13 @@
 package com.example.firebasechat.ui.mainUi
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
+import android.view.Menu
 import android.view.View
-import android.view.WindowManager
 import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.example.firebasechat.R
@@ -22,6 +20,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
+
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var navController: NavController
@@ -29,47 +28,51 @@ class MainActivity : AppCompatActivity() {
     lateinit var firebaseDb: DatabaseReference
     lateinit var progressBar: ProgressBar
     lateinit var prefManager: PrefManager
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        supportActionBar?.title = "ChitChat"
+        //Set NavHostFragment
+        navController = findNavController(R.id.mainNavHostFragment)
+
+
+        //Status BAr Background
+        window.apply { decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR }
+        window.statusBarColor = ContextCompat.getColor(this, R.color.primary)
+
+        //Initialization
         firebaseDb = Firebase.database.reference
         firebaseAuth = FirebaseAuth.getInstance()
-
         progressBar = findViewById(R.id.progressBar)
         prefManager = PrefManager(this)
 
         progressBar.visibility = View.GONE
 
-       // binding.toolbar.userName.text = "ChitChat"
 
-
-        binding.toolbar.more.setOnClickListener {
-            firebaseAuth.signOut()
-            Utils.clear(this)
-            progressBar.visibility = View.VISIBLE
-            startActivity(Intent(this, AuthMobileActivity::class.java))
-            finish()
+        //Set on click on menu itme
+        binding.toolbar.toolbar.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.newMsg->{
+                    navController.navigate(R.id.newMessageFragment)
+                }
+                R.id.profile->{
+                    navController.navigate(R.id.profileFragment)
+                }
+            }
+            true
         }
 
     }
 
-    private fun openMoreMenuDialog() {
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.more_menu_main_activity)
-        val lp = WindowManager.LayoutParams()
-        lp.gravity = Gravity.END
-        val m1 = dialog.findViewById(R.id.logout) as TextView
-        m1.setOnClickListener {
-            firebaseAuth.signOut()
-            Utils.clear(this)
-            progressBar.visibility = View.VISIBLE
-            startActivity(Intent(this, AuthMobileActivity::class.java))
-            finish()
-        }
-        dialog.show()
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.more_menu, menu)
+        return super.onCreateOptionsMenu(menu)
     }
+
 
     private fun deleteAccount() {
         val current = firebaseAuth.currentUser!!
@@ -82,30 +85,38 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    override fun onNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onNavigateUp()
+
+
+    fun hideMenuItem(){
+        binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
     }
 
-    fun hideToolbarItem(){
-        binding.toolbar.back.visibility = View.GONE
-        binding.toolbar.profileImage.visibility = View.GONE
-        binding.toolbar.userName.text = "ChitChat"
+    fun showMenuItem(){
+        binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
     fun showToolbarItem(){
-        binding.toolbar.back.visibility = View.VISIBLE
         binding.toolbar.profileImage.visibility = View.VISIBLE
         binding.toolbar.userName.visibility = View.VISIBLE
+        binding.toolbar.userName.textSize = 17f
+    }
+
+    fun hideToolbarItem(){
+        binding.toolbar.profileImage.visibility = View.GONE
+        binding.toolbar.userName.setText(R.string.app_name)
+        binding.toolbar.userName.textSize = 20f
     }
 
     override fun onStart() {
         super.onStart()
         hideToolbarItem()
+
         val current = firebaseAuth.currentUser?.uid
         if (current.isNullOrEmpty()){
-            startActivity(Intent(this, AuthMobileActivity::class.java))
+            val intent = Intent(this, AuthMobileActivity::class.java)
+            startActivity(intent)
             finish()
-        }else{
+            }else{
             Utils.createToast(this, "Welcome Back!")
         }
     }

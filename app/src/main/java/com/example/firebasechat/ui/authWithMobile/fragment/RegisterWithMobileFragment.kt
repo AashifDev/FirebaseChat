@@ -18,7 +18,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterWithMobileBinding
 import com.example.firebasechat.ui.authWithEmail.AuthEmailActivity
-import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -87,7 +87,8 @@ class RegisterWithMobileFragment : Fragment() {
         }
 
         binding.textViewRegisterWithEmail.setOnClickListener {
-            startActivity(Intent(ApplicationContext.context(), AuthEmailActivity::class.java))
+            startActivity(Intent(App.context(), AuthEmailActivity::class.java))
+            requireActivity().finish()
         }
     }
 
@@ -121,11 +122,11 @@ class RegisterWithMobileFragment : Fragment() {
             override fun onVerificationFailed(e: FirebaseException) {
                 Log.w("TAG", "onVerificationFailed", e)
                 if (e is FirebaseAuthInvalidCredentialsException) {
-                    Utils.createToast(ApplicationContext.context(),"Invalid request")
+                    Utils.createToast(App.context(),"Invalid request")
                 } else if (e is FirebaseTooManyRequestsException) {
-                    Utils.createToast(ApplicationContext.context(),"The SMS quota for the project has been exceeded")
+                    Utils.createToast(App.context(),"The SMS quota for the project has been exceeded")
                 } else if (e is FirebaseAuthMissingActivityForRecaptchaException) {
-                    Utils.createToast(ApplicationContext.context(),"reCAPTCHA verification attempted with null Activity")
+                    Utils.createToast(App.context(),"reCAPTCHA verification attempted with null Activity")
                 }
             }
         }
@@ -148,7 +149,7 @@ class RegisterWithMobileFragment : Fragment() {
         }else{
             binding.progressBarSubmit.visibility = View.GONE
             binding.textViewSubmit.alpha = 1f
-            Utils.createToast(ApplicationContext.context(),"Entered otp is invalid")
+            Utils.createToast(App.context(),"Entered otp is invalid")
         }
 
     }

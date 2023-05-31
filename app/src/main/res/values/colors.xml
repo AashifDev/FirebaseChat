@@ -6,4 +6,6 @@
     <color name="grey">#0C0B0B0B</color>
     <color name="primary">#5DF8B9</color>
     <color name="error_red">#F44336</color>
+    <color name="start">#5FFC9F</color>
+    <color name="end">#5DEFF3</color>
 </resources>

@@ -13,10 +13,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import com.example.firebasechat.databinding.FragmentAddProfileBinding
-import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
-import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -128,11 +127,11 @@ class AddProfileFragment : Fragment() {
             startActivity(Intent(requireActivity(), MainActivity::class.java))
             requireActivity().finish()
 
-            Utils.createToast(ApplicationContext.context(),"Registration completed")
+            Utils.createToast(App.context(),"Registration completed")
         }else{
             binding.progressBarSave.visibility = View.GONE
             binding.textViewSave.alpha = 0f
-            Utils.createToast(ApplicationContext.context(),"Please upload profile image")
+            Utils.createToast(App.context(),"Please upload profile image")
         }
     }
 }

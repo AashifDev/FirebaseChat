@@ -27,7 +27,7 @@ import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
-import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -36,7 +36,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import java.io.File
 
 class RegisterFragment : Fragment() {
 
@@ -87,7 +86,7 @@ class RegisterFragment : Fragment() {
             if (validCredential()) {
                 setRegister()
                 binding.progressCircular.visibility = View.VISIBLE
-                binding.btnRegister.alpha = .7f
+                binding.btnRegister.alpha = .5f
             }
         }
     }
@@ -98,15 +97,18 @@ class RegisterFragment : Fragment() {
                 if (it.isSuccessful) {
                     Toast.makeText(context, "Successfully Registered", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
-                    startActivity(Intent(requireContext(), MainActivity::class.java))
+                    startActivity(Intent(requireActivity(), MainActivity::class.java))
                     requireActivity().finish()
                     addUserToFirebaseDatabase(name, email, profile, mobileNumber)
                     PrefManager.saveUserWithEmail(email)
                     binding.btnRegister.alpha = 1f
                 } else {
-                    Toast.makeText(context, "Registration Failed! try again", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
+                    binding.btnRegister.alpha = 1f
                 }
+            }
+            .addOnFailureListener {
+                Utils.createToast(App.context(), it.message.toString())
             }
     }
 
@@ -146,13 +148,13 @@ class RegisterFragment : Fragment() {
             binding.llPass.helperText = "Password is blank"
             return false
         } else if (pass.length < 6) {
-            Utils.createToast(ApplicationContext.context(), "Minimum 6 character required")
+            Utils.createToast(App.context(), "Minimum 6 character required")
             return false
         } else if (conPass != pass) {
             binding.llConPass.helperText = "Password does not matched"
             return false
         } else if (!profileImage) {
-            Utils.createToast(ApplicationContext.context(), "Please upload image")
+            Utils.createToast(App.context(), "Please upload image")
             return false
         }
         return true

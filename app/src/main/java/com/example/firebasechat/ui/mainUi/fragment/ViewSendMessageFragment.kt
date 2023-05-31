@@ -8,6 +8,9 @@ import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
@@ -25,6 +28,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+
 import java.net.URI
 
 class ViewSendMessageFragment : Fragment() {
@@ -36,6 +40,7 @@ class ViewSendMessageFragment : Fragment() {
 
     var senderRoom:String? = null
     var receiverRoom:String? = null
+
 
     var userName = ""
     var picUrl = ""
@@ -55,18 +60,13 @@ class ViewSendMessageFragment : Fragment() {
 
         setNameAndProfilePicOnToolBar()
 
-
-        (requireActivity() as MainActivity).binding.toolbar.back.setOnClickListener {
-            findNavController().navigate(R.id.homeFragment)
-        }
-        (requireActivity() as MainActivity).binding.toolbar.more.visibility = View.GONE
-
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
 
 
         return binding.root
     }
+
 
     private fun setNameAndProfilePicOnToolBar() {
         (requireActivity() as MainActivity).binding.toolbar.userName.text = userName
@@ -134,19 +134,27 @@ class ViewSendMessageFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        (requireActivity() as MainActivity).hideMenuItem()
         (requireActivity() as MainActivity).showToolbarItem()
+
     }
 
     override fun onPause() {
         super.onPause()
         (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.toolbar.more.visibility = View.VISIBLE
+        (requireActivity() as MainActivity).showMenuItem()
     }
 
     override fun onStop() {
         super.onStop()
         (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.toolbar.more.visibility = View.VISIBLE
+        (requireActivity() as MainActivity).showMenuItem()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).showMenuItem()
     }
 
 }

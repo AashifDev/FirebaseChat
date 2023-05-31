@@ -22,6 +22,11 @@
     <string name="account">Account</string>
     <string name="logout">Logout</string>
     <string name="new_message">New Message</string>
+    <string name="login_with_mobile_number">Login with <b><font color="#5DF8B9">Mobile Number</font></b></string>
+    <string name="message">Message</string>
+    <string name="profile">Profile</string>
+    <string name="block">Block</string>
+    <string name="user_name">User Name</string>
 
     //Spinner Array
     <string-array name="more">

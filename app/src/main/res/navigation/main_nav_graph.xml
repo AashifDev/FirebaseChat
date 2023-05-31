@@ -7,19 +7,17 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.HomeFragment"
-        android:label="ChitChat"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_viewSendMessageFragment"
-            app:destination="@id/viewSendMessageFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/viewSendMessageFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ViewSendMessageFragment"
-        android:label="fragment_view_send_message"
-        tools:layout="@layout/fragment_view_send_message" >
-        <action
-            android:id="@+id/action_viewSendMessageFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_view_send_message" />
+    <fragment
+        android:id="@+id/newMessageFragment"
+        android:name="com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment"
+        tools:layout="@layout/fragment_new_message" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.firebasechat.ui.mainUi.fragment.ProfileFragment"
+        tools:layout="@layout/fragment_profile" />
 </navigation>

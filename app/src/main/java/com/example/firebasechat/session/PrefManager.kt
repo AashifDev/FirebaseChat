@@ -2,7 +2,7 @@ package com.example.firebasechat.session
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.firebasechat.utils.ApplicationContext
+import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
 
 class PrefManager(var context: Context) {
@@ -13,19 +13,19 @@ class PrefManager(var context: Context) {
     companion object{
 
         fun saveUserWithEmail(email:String){
-            Utils.putString(ApplicationContext.context(),"email",email)
+            Utils.putString(App.context(),"email",email)
         }
 
         fun saveUserWithNumber(number:String){
-           Utils.putInt(ApplicationContext.context(), number,number.toInt())
+           Utils.putInt(App.context(), number,number.toInt())
         }
 
         fun getUserEmail():String?{
-            return Utils.getString(ApplicationContext.context(),"email","")
+            return Utils.getString(App.context(),"email","")
         }
 
         fun getUserNumber(): Int {
-            return Utils.getInt(ApplicationContext.context(),"number",0)
+            return Utils.getInt(App.context(),"number",0)
         }
 
     }

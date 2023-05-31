@@ -7,11 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentLoginBinding
 import com.example.firebasechat.session.PrefManager
+import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -36,6 +40,17 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.register.setOnClickListener { findNavController().navigate(R.id.registerFragment) }
+
+        binding.back.setOnClickListener {
+            startActivity(Intent(App.context(),AuthMobileActivity::class.java))
+            requireActivity().finish()
+        }
+
+        binding.textViewLoginWithMobile.setOnClickListener {
+            startActivity(Intent(App.context(),AuthMobileActivity::class.java))
+            requireActivity().finish()
+        }
+
         binding.btnLogin.setOnClickListener {
             if (validCredential()){
                 setLogin()
@@ -51,12 +66,10 @@ class LoginFragment : Fragment() {
         password = binding.etPass.text.toString().trim()
 
         if (email.isEmpty() && email==""){
-            binding.etEmail.error = "Enter email"
-            binding.etEmail.requestFocus()
+            binding.llEmail.helperText = "Email Required"
             return false
         } else if(password.isEmpty() && password==""){
-            binding.etPass.error = "Enter password"
-            binding.etPass.requestFocus()
+            binding.llPass.helperText = "Password Required"
             return false
         }
         return true
@@ -67,15 +80,18 @@ class LoginFragment : Fragment() {
             .addOnCompleteListener {
                 if (it.isSuccessful){
                     PrefManager.saveUserWithEmail(email)
-                    Toast.makeText(context, "Successfully Login", Toast.LENGTH_SHORT).show()
+                    Utils.createToast(App.context(),"Successfully Login")
                     binding.progressCircular.visibility = View.VISIBLE
                     binding.btnLogin.alpha = 1f
                     startActivity(Intent(context,MainActivity::class.java))
                     requireActivity().finish()
                 }else{
-                    Toast.makeText(context, "Login Failed! try again", Toast.LENGTH_SHORT).show()
                     binding.progressCircular.visibility = View.GONE
+                    binding.btnLogin.alpha = 1f
                 }
+            }
+            .addOnFailureListener {
+                Utils.createToast(App.context(), it.message)
             }
 
     }
