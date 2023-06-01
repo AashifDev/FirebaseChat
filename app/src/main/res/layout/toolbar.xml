@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
             android:layout_height="50dp"
             android:padding="6dp"
             android:visibility="gone"
-            android:src="@drawable/person"
+            android:src="@drawable/personn"
             app:layout_constraintBottom_toBottomOf="@id/back"
             app:layout_constraintStart_toEndOf="@id/back"
             app:layout_constraintTop_toTopOf="@id/back" />
@@ -55,6 +55,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:src="@drawable/more"/>-->
 
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
 </com.google.android.material.appbar.AppBarLayout>

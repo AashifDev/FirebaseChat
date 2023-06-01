@@ -3,6 +3,7 @@ package com.example.firebasechat.ui.mainUi
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.ProgressBar
@@ -60,7 +61,17 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.newMessageFragment)
                 }
                 R.id.profile->{
-                    navController.navigate(R.id.profileFragment)
+                    val currentId = firebaseAuth.currentUser?.uid
+                    val bundle = Bundle().apply {
+                        putString("currentId",currentId)
+                    }
+                    navController.navigate(R.id.profileFragment,bundle)
+                }
+                R.id.signout->{
+                    firebaseAuth.signOut()
+                    val intent = Intent(this, AuthMobileActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 }
             }
             true
@@ -87,18 +98,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun hideMenuItem(){
-        binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
-    }
-
-    fun showMenuItem(){
-        binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
-    }
-
     fun showToolbarItem(){
         binding.toolbar.profileImage.visibility = View.VISIBLE
         binding.toolbar.userName.visibility = View.VISIBLE
-        binding.toolbar.userName.textSize = 17f
+        binding.toolbar.userName.textSize = 15f
     }
 
     fun hideToolbarItem(){
@@ -110,6 +113,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         hideToolbarItem()
+        binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
 
         val current = firebaseAuth.currentUser?.uid
         if (current.isNullOrEmpty()){
@@ -119,6 +123,16 @@ class MainActivity : AppCompatActivity() {
             }else{
             Utils.createToast(this, "Welcome Back!")
         }
+        /*val current = firebaseAuth.currentUser!!.getIdToken(true)
+
+        current.addOnSuccessListener {
+            val intent = Intent(this, AuthMobileActivity::class.java)
+            startActivity(intent)
+            finish()
+        }.addOnFailureListener {
+            Log.e("err",it.message.toString())
+        }*/
+        Log.d("tag", current.toString())
     }
 
     override fun onRestart() {

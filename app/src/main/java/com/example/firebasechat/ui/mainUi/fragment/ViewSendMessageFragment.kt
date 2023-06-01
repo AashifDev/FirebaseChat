@@ -134,27 +134,27 @@ class ViewSendMessageFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        (requireActivity() as MainActivity).hideMenuItem()
         (requireActivity() as MainActivity).showToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
 
     }
 
     override fun onPause() {
         super.onPause()
         (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).showMenuItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
     override fun onStop() {
         super.onStop()
         (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).showMenuItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
     override fun onDestroy() {
         super.onDestroy()
         (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).showMenuItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
 }

@@ -67,7 +67,7 @@ class RegisterFragment : Fragment() {
         firebaseDb = Firebase.database.reference
         firebaseStorage = Firebase.storage
 
-
+        binding.progressCircular.visibility = View.GONE
 
         return binding.root
     }
@@ -82,11 +82,11 @@ class RegisterFragment : Fragment() {
 
         binding.textViewLoginWithEmail.setOnClickListener { findNavController().navigate(R.id.loginFragment) }
 
-        binding.btnRegister.setOnClickListener {
+        binding.register.setOnClickListener {
             if (validCredential()) {
                 setRegister()
                 binding.progressCircular.visibility = View.VISIBLE
-                binding.btnRegister.alpha = .5f
+                binding.register.alpha = .5f
             }
         }
     }
@@ -101,10 +101,10 @@ class RegisterFragment : Fragment() {
                     requireActivity().finish()
                     addUserToFirebaseDatabase(name, email, profile, mobileNumber)
                     PrefManager.saveUserWithEmail(email)
-                    binding.btnRegister.alpha = 1f
+                    binding.register.alpha = 1f
                 } else {
                     binding.progressCircular.visibility = View.GONE
-                    binding.btnRegister.alpha = 1f
+                    binding.register.alpha = 1f
                 }
             }
             .addOnFailureListener {

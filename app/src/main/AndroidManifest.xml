@@ -9,7 +9,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="33" />
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name=".utils.App"
@@ -30,8 +32,7 @@
             android:exported="false" />
         <activity
             android:name=".splash.SplashScreenActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,8 +41,7 @@
         </activity>
         <activity
             android:name=".ui.mainUi.MainActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false"/>
     </application>
 
 </manifest>

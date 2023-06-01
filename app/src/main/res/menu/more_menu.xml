@@ -14,4 +14,9 @@
         android:title="@string/account"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/signout"
+        android:title="Signout"
+        app:showAsAction="never"/>
+
+
 </menu>

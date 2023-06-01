@@ -37,7 +37,15 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : Recyc
             }
             holder.user.findNavController().navigate(R.id.viewSendMessageFragment,bundle)
         }
-        Glide.with(context).load(item.pic).into(holder.profileImage)
+        if (holder.profileImage != null){
+            Glide.with(context).load(item.pic).into(holder.profileImage)
+        }
+        else{
+            holder.profileImage.setImageResource(R.drawable.personn)
+        }
+
+
+
     }
 
 }
