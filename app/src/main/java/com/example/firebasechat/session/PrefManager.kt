@@ -2,8 +2,10 @@ package com.example.firebasechat.session
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.firebasechat.model.User
 import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
+import com.google.gson.Gson
 
 class PrefManager(var context: Context) {
 
@@ -17,16 +19,26 @@ class PrefManager(var context: Context) {
         }
 
         fun saveUserWithNumber(number:String){
-           Utils.putInt(App.context(), number,number.toInt())
+           Utils.putString(App.context(), "number",number)
         }
 
         fun getUserEmail():String?{
             return Utils.getString(App.context(),"email","")
         }
 
-        fun getUserNumber(): Int {
-            return Utils.getInt(App.context(),"number",0)
+        fun getUserNumber(): String?{
+            return Utils.getString(App.context(),"number","")
         }
+
+        fun saveUserDetail(user:User?){
+            Utils.putString(App.context(),"userData", Gson().toJson(user))
+        }
+
+        fun getUserDetail():User?{
+            return Gson().fromJson(Utils.getString(App.context(),"userData", ""),User::class.java)
+        }
+
+
 
     }
 

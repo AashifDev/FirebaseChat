@@ -9,7 +9,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/status_card_background"
+        android:layout_margin="1dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/statusImage"
@@ -18,13 +20,12 @@
             android:scaleType="fitXY"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profileBorder"
+            android:id="@+id/profile"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:src="@color/white"
-            android:background="@drawable/transparent_background"
             app:civ_border_color="@color/primary"
             app:civ_border_width="1dp"
             app:civ_border_overlay="true"
@@ -32,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
+       <!-- <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile"
             android:layout_width="35dp"
             android:layout_height="35dp"
@@ -46,7 +47,7 @@
             app:layout_constraintStart_toStartOf="@id/profileBorder"
             app:layout_constraintTop_toTopOf="@id/profileBorder"
             app:layout_constraintEnd_toEndOf="@id/profileBorder"
-            app:layout_constraintBottom_toBottomOf="@id/profileBorder"/>
+            app:layout_constraintBottom_toBottomOf="@id/profileBorder"/>-->
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/userName"

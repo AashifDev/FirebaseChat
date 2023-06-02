@@ -40,6 +40,7 @@ class RegisterWithMobileFragment : Fragment() {
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var firebaseDb: DatabaseReference
 
+    var countryCode = ""
     var mobileNumber = ""
     var verificationId = ""
     var registerWith = "Register with phone"
@@ -58,13 +59,12 @@ class RegisterWithMobileFragment : Fragment() {
         binding.progressBarNext.visibility = View.GONE
         binding.progressBarSubmit.visibility = View.GONE
 
-
         return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        showKeyboardOnFragmentStart()
+        //showKeyboardOnFragmentStart()
 
         binding.textViewNext.setOnClickListener {
             if (validMobileNumber()){
@@ -73,7 +73,7 @@ class RegisterWithMobileFragment : Fragment() {
                 binding.progressBarNext.visibility = View.VISIBLE
                 binding.inputLayoutMobileNumber.isEnabled = false
                 binding.textViewNext.alpha = .5f
-                val countryCode = "+91"+binding.editTextMobileNumber.text.toString()
+                countryCode = "+1"+binding.editTextMobileNumber.text.toString()
                 sendVerificationOtp(countryCode)
             }
         }
@@ -109,6 +109,7 @@ class RegisterWithMobileFragment : Fragment() {
                 binding.inputLayoutOtp.visibility = View.VISIBLE
                 binding.progressBarNext.visibility = View.GONE
                 binding.textViewNext.visibility = View.GONE
+                Utils.createToast(App.context(),"Otp sent")
             }
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
@@ -143,7 +144,8 @@ class RegisterWithMobileFragment : Fragment() {
 
     private fun verifyOtp(code: String) {
         val otp = binding.editTextOtp.text.toString()
-        if (code != otp){
+
+        if (code == otp){
             val credential = PhoneAuthProvider.getCredential(verificationId,code)
             signInWithCredential(credential)
         }else{

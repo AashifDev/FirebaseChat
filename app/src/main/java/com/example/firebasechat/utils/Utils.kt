@@ -10,6 +10,7 @@ import android.widget.Toast
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -122,6 +123,13 @@ object Utils {
         }
         return changedTime
     }*/
+
+    fun dateTime(calendar: Calendar): String {
+        val dtForm: DateFormat = SimpleDateFormat("ddd MMM dd yyyy",Locale.US)
+        val date: String = dtForm.format(Calendar.getInstance().time)
+        return date
+    }
+
 
     fun getImageUriFromBitmap(context: Context?, bitmap: Bitmap?):Uri{
         val bytes = ByteArrayOutputStream()

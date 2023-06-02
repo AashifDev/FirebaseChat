@@ -3,6 +3,7 @@ package com.example.firebasechat.ui.mainUi
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Vibrator
 import android.util.Log
 import android.view.Menu
 import android.view.View
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var firebaseDb: DatabaseReference
     lateinit var progressBar: ProgressBar
     lateinit var prefManager: PrefManager
+    private lateinit var vibrator: Vibrator
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +78,23 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+        //Bottom NavigationView
+       binding.bottomNavigation.setOnItemSelectedListener {
+           when(it.itemId){
+               R.id.home->{
+                   navController.navigate(R.id.homeFragment)
+                   vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                   vibrator.vibrate(20)
+               }
+               R.id.status->{
+                   navController.navigate(R.id.viewStatusFragment)
+                   vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                   vibrator.vibrate(20)
+               }
+           }
+           return@setOnItemSelectedListener true
+       }
 
     }
 

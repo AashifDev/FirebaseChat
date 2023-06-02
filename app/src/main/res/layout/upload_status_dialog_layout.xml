@@ -10,7 +10,7 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="2"
+        android:weightSum="3"
         android:background="@drawable/dialog_border"
         android:padding="50dp"
         android:orientation="horizontal">
@@ -21,6 +21,13 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:src="@drawable/camera"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/video"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:src="@drawable/video"/>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/gallery"

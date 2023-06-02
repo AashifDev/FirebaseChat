@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1003491352267-5asnjme3a0497532kmalolgpr8bv34r8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firebasechat",
+            "certificate_hash": "e8c107bfe91daf7067745cb8e02014f46ce24993"
+          }
+        },
+        {
           "client_id": "1003491352267-clrijij2e1gpr3avma19ospu9kijug1h.apps.googleusercontent.com",
           "client_type": 3
         }

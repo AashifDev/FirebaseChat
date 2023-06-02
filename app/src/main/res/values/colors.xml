@@ -9,4 +9,5 @@
     <color name="start">#5FFC9F</color>
     <color name="end">#5DEFF3</color>
     <color name="transparent">#00000000</color>
+    <color name="shimmer_placeholder">#dddddd</color>
 </resources>

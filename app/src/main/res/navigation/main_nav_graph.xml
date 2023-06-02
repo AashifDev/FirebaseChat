@@ -20,4 +20,9 @@
         android:id="@+id/profileFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ProfileFragment"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/viewStatusFragment"
+        android:name="com.example.firebasechat.ui.mainUi.fragment.ViewStatusFragment"
+        android:label="fragment_view_status"
+        tools:layout="@layout/fragment_view_status" />
 </navigation>

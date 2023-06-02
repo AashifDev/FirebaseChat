@@ -57,8 +57,9 @@ class HomeFragment : Fragment() {
 
     val CAMERA_REQ_CODE = 101
     val GALLERY_REQ_CODE = 102
+    val VIDEO_REQ_CODE = 103
 
-    var uid = ""
+    var uid:String? = null
     var profile: Uri? = null
     var status: Uri? = null
     var path = ""
@@ -82,6 +83,7 @@ class HomeFragment : Fragment() {
 
         binding.progressBar.visibility = View.VISIBLE
         binding.noChat.visibility = View.GONE
+        binding.shimmerStatus.visibility = View.GONE
 
 
         return binding.root
@@ -99,17 +101,18 @@ class HomeFragment : Fragment() {
 
         addStatus()
 
+
         setUserToRecyclerView()
         setStatusRecyclerView()
+
     }
 
     private fun setStatusRecyclerView() {
-        val layoutManager = LinearLayoutManager(App.context())
+        /*val layoutManager = LinearLayoutManager(App.context())
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         layoutManager.stackFromEnd = true
         layoutManager.reverseLayout = true
-        binding.recyclerViewStatus.layoutManager = layoutManager
-        uid = firebaseAuth.currentUser!!.uid
+        binding.recyclerViewStatus.layoutManager = layoutManager*/
         firebaseDb.child("status").child("uid").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 statusList.clear()
@@ -168,7 +171,7 @@ class HomeFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun uploadStatus() {
         val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.upload_profile_layout)
+        dialog.setContentView(R.layout.upload_status_dialog_layout)
 
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
@@ -181,6 +184,7 @@ class HomeFragment : Fragment() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val camera = dialog.findViewById(R.id.camera) as ImageView
+        val video = dialog.findViewById(R.id.video) as ImageView
         val gallery = dialog.findViewById(R.id.gallery) as ImageView
 
         camera.setOnClickListener {
@@ -195,6 +199,23 @@ class HomeFragment : Fragment() {
                 )
             } else {
                 openCamera()
+            }
+            dialog.dismiss()
+        }
+
+        video.setOnClickListener {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    Array(1) { android.Manifest.permission.READ_EXTERNAL_STORAGE },
+                    VIDEO_REQ_CODE
+                )
+            } else {
+                openVideo()
             }
             dialog.dismiss()
         }
@@ -215,9 +236,17 @@ class HomeFragment : Fragment() {
             }
             dialog.dismiss()
         }
+
         dialog.show()
 
         dialog.setCancelable(true)
+    }
+
+    private fun openVideo() {
+        val videoIntent = Intent()
+        videoIntent.type = "video/*"
+        videoIntent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(videoIntent, GALLERY_REQ_CODE)
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -251,6 +280,17 @@ class HomeFragment : Fragment() {
 
             }
 
+            VIDEO_REQ_CODE -> {
+                try {
+                    val bitmap = data!!.extras!!.get("data") as Bitmap
+                    status = Utils.getUriFromFile(requireContext(), bitmap)
+                    success()
+                    profileImage = true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
             GALLERY_REQ_CODE -> {
                 try {
                     status = data!!.data
@@ -264,13 +304,19 @@ class HomeFragment : Fragment() {
     }
 
     private fun success() {
-        uid = firebaseAuth.currentUser!!.uid
-        val email = firebaseAuth.currentUser?.email.toString()
+
+        binding.shimmerStatus.visibility = View.VISIBLE
+        binding.shimmerStatus.startShimmer()
+
+        /*val email = firebaseAuth.currentUser?.email.toString()
         val dtForm: DateFormat = SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.")
         val date: String = dtForm.format(Calendar.getInstance().time)
-        val fileName = date + FirebaseAuth.getInstance().currentUser!!.uid
+        val fileName = date + FirebaseAuth.getInstance().currentUser!!.uid*/
+        val email = firebaseAuth.currentUser?.email.toString()
+
+        val dateTime = Utils.dateTime(Calendar.getInstance())
         if (status != null){
-            val ref = firebaseStorage.reference.child("status/").child(uid+email).child("status/$fileName")
+            val ref = firebaseStorage.reference.child("status/").child(email).child("status/$dateTime")
             ref.putFile(status!!)
                 .addOnSuccessListener {
                     ref.downloadUrl
@@ -280,6 +326,8 @@ class HomeFragment : Fragment() {
                             val profileImage = user!!.pic
                             val status = Status(path,usrName,profileImage)
                             firebaseDb.child("status").child("uid").push().setValue(status)
+                            binding.shimmerStatus.visibility = View.GONE
+                            binding.shimmerStatus.stopShimmer()
                         }
                         .addOnFailureListener {
                             Utils.createToast(App.context(), "Try again")

@@ -27,6 +27,8 @@
     <string name="profile">Profile</string>
     <string name="block">Block</string>
     <string name="user_name">User Name</string>
+    <string name="tab_to_add_status_update">Tab to add status update</string>
+    <string name="username">UserName</string>
 
     //Spinner Array
     <string-array name="more">

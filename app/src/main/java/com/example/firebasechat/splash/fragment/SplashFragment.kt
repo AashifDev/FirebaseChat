@@ -39,9 +39,9 @@ class SplashFragment : Fragment() {
                 startActivity(Intent(App.context(), MainActivity::class.java))
                 requireActivity().finish()
             },2000)
-        }else if (currentUserNumber == null){
+        }else if (!currentUserNumber.isNullOrEmpty()){
             Handler(Looper.getMainLooper()).postDelayed(Runnable{
-                startActivity(Intent(App.context(), AuthMobileActivity::class.java))
+                startActivity(Intent(App.context(), MainActivity::class.java))
                 requireActivity().finish()
             },2000)
         }else{
