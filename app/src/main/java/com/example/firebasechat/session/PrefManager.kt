@@ -2,9 +2,9 @@ package com.example.firebasechat.session
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.firebasechat.model.User
 import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
+import com.google.firebase.firestore.auth.User
 import com.google.gson.Gson
 
 class PrefManager(var context: Context) {

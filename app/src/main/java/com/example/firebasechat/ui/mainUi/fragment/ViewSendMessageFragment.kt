@@ -17,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewSendMessageBinding
-import com.example.firebasechat.model.Message
+import com.example.firebasechat.mvvm.model.Message
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.MessageAdapter
 import com.example.firebasechat.utils.Utils

@@ -26,8 +26,8 @@ import com.google.firebase.ktx.Firebase
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var navController: NavController
-    lateinit var firebaseAuth: FirebaseAuth
-    lateinit var firebaseDb: DatabaseReference
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firebaseDb: DatabaseReference
     lateinit var progressBar: ProgressBar
     lateinit var prefManager: PrefManager
     private lateinit var vibrator: Vibrator

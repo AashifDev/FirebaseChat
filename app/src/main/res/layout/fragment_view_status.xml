@@ -15,11 +15,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addStatus"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:elevation="0dp"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center_vertical"
+        android:src="@android:drawable/ic_input_add"
+        app:layout_constraintBottom_toBottomOf="@id/userProfile"
+        app:layout_constraintEnd_toEndOf="@id/userProfile"/>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/username"
+        android:text="@string/my_status"
         android:layout_margin="6dp"
         android:textSize="18sp"
         android:textColor="@color/black"
@@ -50,8 +61,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/user_status_all"
         app:layout_constraintTop_toBottomOf="@+id/dividerLine"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

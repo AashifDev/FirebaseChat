@@ -10,6 +10,14 @@
 
     <style name="Theme.FirebaseChat" parent="Base.Theme.FirebaseChat" />
 
+    //CircleImageView
+    <style name="roundedImageViewRounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+        <item name="android:dashGap">50dp</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="strokeWidth">2dp</item>
+    </style>
 
     //Progress Bar
     <style name="progress_bar_theme">

@@ -1,34 +1,36 @@
-/*
 package com.example.firebasechat.ui.mainUi.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.firebasechat.R
-import com.example.firebasechat.model.Status
+import com.example.firebasechat.databinding.UserStatusAllBinding
+import com.example.firebasechat.databinding.UserStatusSingleItemBinding
+import com.example.firebasechat.mvvm.model.Status
 import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
 import com.example.firebasechat.ui.mainUi.fragment.ViewStatusFragment
+import com.example.firebasechat.utils.MyDiffUtil
 
-class StatusAdapter(val context: Context, val statusList: ArrayList<Status>, val fragment: Fragment) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class StatusAdapter(val context: Context, var statusList: ArrayList<Status>, val fragment: Fragment) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when(fragment){
+        return when (fragment) {
             is HomeFragment -> {
-                HomeFragmentViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.user_status_single_item, parent, false))
+                HomeFragmentViewHolder(
+                    UserStatusSingleItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
             }
 
-            is ViewStatusFragment->{
-                StatusFragmentViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.user_status_all, parent, false))
+            is ViewStatusFragment -> {
+                StatusFragmentViewHolder(
+                    UserStatusAllBinding.inflate(LayoutInflater.from(parent.context) ,parent, false))
             }
 
             else -> {
-                HomeFragmentViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.user_status_single_item, parent, false))
+                HomeFragmentViewHolder(
+                    UserStatusSingleItemBinding.inflate(LayoutInflater.from(parent.context) ,parent, false))
             }
         }
     }
@@ -38,31 +40,35 @@ class StatusAdapter(val context: Context, val statusList: ArrayList<Status>, val
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         val currentStatus = statusList[position]
-        if (holder.javaClass == HomeFragmentViewHolder::class.java){
+        if (holder.javaClass == HomeFragmentViewHolder::class.java) {
             val viewHolder = holder as HomeFragmentViewHolder
-            if (holder.statusImg != null && holder.userProfile != null){
-                Glide.with(context).load(currentStatus.statusUrl).into(holder.statusImg)
-                Glide.with(context).load(currentStatus.userProfile).into(holder.userProfile)
+            holder.binding.userName.text = currentStatus.userName
+            if (holder.binding.statusImage != null && holder.binding.profile != null) {
+                Glide.with(context).load(currentStatus.statusUrl).into(holder.binding.statusImage)
+                Glide.with(context).load(currentStatus.userProfile).into(holder.binding.profile)
             }
-        }else{
+        } else {
             val viewHolder = holder as StatusFragmentViewHolder
-            if (holder.statusImg1 != null && holder.userProfile1 != null){
-                Glide.with(context).load(currentStatus.statusUrl).into(holder.statusImg1)
-                Glide.with(context).load(currentStatus.userProfile).into(holder.userProfile1)
+            holder.binding.userName.text = currentStatus.userName
+            holder.binding.dateTime.text = currentStatus.dateTime
+            if (holder.binding.statusImage != null) {
+                Glide.with(context).load(currentStatus.statusUrl).into(holder.binding.statusImage)
             }
         }
 
 
     }
 
-    class HomeFragmentViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        val statusImg: ImageView = itemView.findViewById(R.id.statusImage)
-        val userProfile: ImageView = itemView.findViewById(R.id.profile)
-        val userName:TextView = itemView.findViewById(R.id.userName)
+    class HomeFragmentViewHolder(val binding: UserStatusSingleItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    class StatusFragmentViewHolder(val binding: UserStatusAllBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    fun setData(newStatusList: ArrayList<Status>){
+        val diffUtil = MyDiffUtil(statusList,newStatusList)
+        val diffResult = DiffUtil.calculateDiff(diffUtil)
+        statusList = newStatusList
+        diffResult.dispatchUpdatesTo(this)
     }
-    class StatusFragmentViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        val statusImg1: ImageView = itemView.findViewById(R.id.statusImage)
-        val userProfile1: ImageView = itemView.findViewById(R.id.profile)
-        val userName1:TextView = itemView.findViewById(R.id.userName)
-    }
-}*/
+}

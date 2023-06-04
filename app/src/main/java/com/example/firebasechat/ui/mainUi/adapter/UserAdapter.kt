@@ -10,7 +10,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
-import com.example.firebasechat.model.User
+import com.example.firebasechat.mvvm.model.User
 import de.hdodenhof.circleimageview.CircleImageView
 
 class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){

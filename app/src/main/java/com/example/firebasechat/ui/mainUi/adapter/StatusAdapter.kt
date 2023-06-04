@@ -1,3 +1,4 @@
+/*
 package com.example.firebasechat.ui.mainUi.adapter
 
 import android.content.Context
@@ -35,4 +36,4 @@ class StatusAdapter(val context: Context, val statusList: ArrayList<Status>) : R
             Glide.with(context).load(item.userProfile).into(holder.userProfile)
         }
     }
-}
+}*/

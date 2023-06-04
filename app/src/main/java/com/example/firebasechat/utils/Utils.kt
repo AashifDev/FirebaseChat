@@ -1,12 +1,24 @@
 package com.example.firebasechat.utils
 
+import android.app.Dialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.view.Gravity
+import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.example.firebasechat.R
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -85,7 +97,14 @@ object Utils {
         return formattedDate
     }
 
-    fun changeTimeFormat(time:String?):String?{
+    /*
+        MM/dd/yyyy hh:mm:ss tt	08/05/2006 03:05:15 PM
+        M/d/yy h :m:s tt	8/5/06 3:5:15 PM
+        ddd MMM dd yyyy	Sat Aug 05 2006
+        dddd, MMMM dd yyyy	Saturday, August 05 2006
+    */
+
+    /*fun changeTimeFormat(time:String?):String?{
         var formattedTime = ""
         try {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
@@ -96,9 +115,9 @@ object Utils {
             e.printStackTrace()
         }
         return formattedTime
-    }
+    }*/
 
-   /* fun changeDateFormat(time: String?): String? {
+   /*fun changeDateFormat(time: String?): String? {
         var changedDate = ""
         try {
             val fmt = SimpleDateFormat("yyyy-MM-dd ")
@@ -109,9 +128,9 @@ object Utils {
             e.printStackTrace()
         }
         return changedDate
-    }
+    }*/
 
-    fun changeTimeFormat(time: String?): String?{
+    /*fun changeTimeFormat(time: String?): String?{
         var changedTime = ""
         try {
             val display = SimpleDateFormat("hh:mm a", Locale.US)
@@ -125,8 +144,8 @@ object Utils {
     }*/
 
     fun dateTime(calendar: Calendar): String {
-        val dtForm: DateFormat = SimpleDateFormat("ddd MMM dd yyyy",Locale.US)
-        val date: String = dtForm.format(Calendar.getInstance().time)
+        val dtForm: DateFormat = SimpleDateFormat("dd-MMMM-yyyy",Locale.US)
+        val date: String = dtForm.format(calendar.time)
         return date
     }
 

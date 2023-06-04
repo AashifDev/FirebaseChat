@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.GradientDrawable.Orientation
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,12 +20,10 @@ import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
-import com.example.firebasechat.model.Status
-import com.example.firebasechat.model.User
+import com.example.firebasechat.mvvm.model.Status
+import com.example.firebasechat.mvvm.model.User
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
@@ -41,8 +38,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class HomeFragment : Fragment() {
@@ -83,7 +78,8 @@ class HomeFragment : Fragment() {
 
         binding.progressBar.visibility = View.VISIBLE
         binding.noChat.visibility = View.GONE
-        binding.shimmerStatus.visibility = View.GONE
+        binding.shimmerStatus.stopShimmer()
+        binding.shimmerStatus.hideShimmer()
 
 
         return binding.root
@@ -97,13 +93,14 @@ class HomeFragment : Fragment() {
         statusList = ArrayList()
 
         adapter = UserAdapter(requireContext(),userList)
-        statusAdapter = StatusAdapter(requireContext(),statusList)
+        statusAdapter = StatusAdapter(requireContext(),statusList,this@HomeFragment)
 
         addStatus()
 
 
         setUserToRecyclerView()
         setStatusRecyclerView()
+
 
     }
 
@@ -118,10 +115,12 @@ class HomeFragment : Fragment() {
                 statusList.clear()
                 for (postSnapshot in snapshot.children){
                     val status = postSnapshot.getValue(Status::class.java)
-                    statusList.add(status!!)
+                    if (firebaseAuth.currentUser!!.uid != status!!.id){
+                        statusList.add(status)
+                    }
                     binding.recyclerViewStatus.adapter = statusAdapter
+                    statusAdapter.setData(statusList)
                 }
-                statusAdapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -315,6 +314,7 @@ class HomeFragment : Fragment() {
         val email = firebaseAuth.currentUser?.email.toString()
 
         val dateTime = Utils.dateTime(Calendar.getInstance())
+        val id = firebaseAuth.currentUser!!.uid
         if (status != null){
             val ref = firebaseStorage.reference.child("status/").child(email).child("status/$dateTime")
             ref.putFile(status!!)
@@ -324,12 +324,14 @@ class HomeFragment : Fragment() {
                             path = it.toString()
                             val usrName = user!!.name
                             val profileImage = user!!.pic
-                            val status = Status(path,usrName,profileImage)
+                            //val dateTime = Utils.dateTime(Calendar.getInstance())
+                            val status = Status(id,path,usrName,profileImage,dateTime)
                             firebaseDb.child("status").child("uid").push().setValue(status)
                             binding.shimmerStatus.visibility = View.GONE
                             binding.shimmerStatus.stopShimmer()
                         }
                         .addOnFailureListener {
+                            Log.e("err",it.message.toString())
                             Utils.createToast(App.context(), "Try again")
                         }
                 }
@@ -338,7 +340,7 @@ class HomeFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        (requireActivity() as MainActivity).showToolbarItem()
+        (requireActivity() as MainActivity).hideToolbarItem()
 
     }
 

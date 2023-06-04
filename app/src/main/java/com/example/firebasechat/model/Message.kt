@@ -1,3 +1,4 @@
+/*
 package com.example.firebasechat.model
 
 class Message {
@@ -10,4 +11,4 @@ class Message {
         this.senderId = senderId
     }
 
-}
+}*/

@@ -28,8 +28,8 @@
     <string name="block">Block</string>
     <string name="user_name">User Name</string>
     <string name="tab_to_add_status_update">Tab to add status update</string>
-    <string name="username">UserName</string>
-
+    <string name="my_status">My Status</string>
+    <string name="_16_june_2023">16 June 2023</string>
     //Spinner Array
     <string-array name="more">
         <item>Logout</item>

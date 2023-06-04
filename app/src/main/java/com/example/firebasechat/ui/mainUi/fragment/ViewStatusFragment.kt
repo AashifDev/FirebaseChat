@@ -8,7 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewStatusBinding
-import com.example.firebasechat.model.Status
+import com.example.firebasechat.mvvm.model.Status
+import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.utils.App
 import com.google.firebase.auth.FirebaseAuth
@@ -35,17 +36,24 @@ class ViewStatusFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentViewStatusBinding.inflate(layoutInflater, container, false)
-        statusList = ArrayList()
+
 
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
         firebaseStorage = Firebase.storage
 
+        statusList = ArrayList()
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = StatusAdapter(requireContext(), statusList)
+
+        binding.userProfile.setOnClickListener{
+
+        }
+        adapter = StatusAdapter(requireContext(), statusList,this)
+
         setStatusToRecyclerView()
     }
 
@@ -55,10 +63,12 @@ class ViewStatusFragment : Fragment() {
                 statusList.clear()
                 for (postSnapshot in snapshot.children){
                     val status = postSnapshot.getValue(Status::class.java)
-                    statusList.add(status!!)
+                    if (firebaseAuth.currentUser!!.uid != status!!.id){
+                        statusList.add(status)
+                    }
                     binding.recyclerViewStatus.adapter = adapter
+                    adapter.setData(statusList)
                 }
-                adapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -66,6 +76,31 @@ class ViewStatusFragment : Fragment() {
             }
 
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
 }

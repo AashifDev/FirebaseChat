@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.firebasechat.R
-import com.example.firebasechat.model.Message
+import com.example.firebasechat.mvvm.model.Message
 import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdapter(val context: Context, val msgList: ArrayList<Message>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
