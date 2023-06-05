@@ -1,26 +1,18 @@
 package com.example.firebasechat.ui.mainUi.fragment
 
-import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextUtils
-import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewSendMessageBinding
-import com.example.firebasechat.mvvm.model.Message
+import com.example.firebasechat.model.Message
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.MessageAdapter
-import com.example.firebasechat.utils.Utils
+import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -29,14 +21,13 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-import java.net.URI
 
 class ViewSendMessageFragment : Fragment() {
     lateinit var binding: FragmentViewSendMessageBinding
     lateinit var adapter: MessageAdapter
     lateinit var msgList: ArrayList<Message>
-    lateinit var firebaseAuth: FirebaseAuth
-    lateinit var firebaseDb: DatabaseReference
+    /*lateinit var firebaseAuth: FirebaseAuth
+    lateinit var firebaseDb: DatabaseReference*/
 
     var senderRoom:String? = null
     var receiverRoom:String? = null
@@ -60,8 +51,8 @@ class ViewSendMessageFragment : Fragment() {
 
         setNameAndProfilePicOnToolBar()
 
-        firebaseAuth = FirebaseAuth.getInstance()
-        firebaseDb = Firebase.database.reference
+        /*firebaseAuth = FirebaseAuth.getInstance()
+        firebaseDb = Firebase.database.reference*/
 
 
         return binding.root
@@ -156,5 +147,6 @@ class ViewSendMessageFragment : Fragment() {
         (requireActivity() as MainActivity).hideToolbarItem()
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
+
 
 }

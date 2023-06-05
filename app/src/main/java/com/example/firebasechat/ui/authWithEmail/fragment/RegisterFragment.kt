@@ -24,25 +24,22 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterBinding
-import com.example.firebasechat.mvvm.model.User
+import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
+import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
+import com.example.firebasechat.utils.FirebaseInstance.firebaseStorage
 import com.example.firebasechat.utils.Utils
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 
 class RegisterFragment : Fragment() {
 
     lateinit var binding: FragmentRegisterBinding
-    lateinit var firebaseAuth: FirebaseAuth
+    /*lateinit var firebaseAuth: FirebaseAuth
     lateinit var firebaseDb: DatabaseReference
-    lateinit var firebaseStorage: FirebaseStorage
+    lateinit var firebaseStorage: FirebaseStorage*/
 
     val CAMERA_REQ_CODE = 101
     val GALLERY_REQ_CODE = 102
@@ -63,10 +60,10 @@ class RegisterFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
-        firebaseAuth = FirebaseAuth.getInstance()
+        /*firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference
         firebaseStorage = Firebase.storage
-
+*/
         binding.progressCircular.visibility = View.GONE
 
         return binding.root
@@ -120,7 +117,7 @@ class RegisterFragment : Fragment() {
     ) {
         uid = firebaseAuth.currentUser?.uid.toString()
         if (profile != null){
-            val ref = firebaseStorage.reference.child("profileImageEmailUser/" + firebaseAuth.currentUser?.email)
+            val ref = firebaseStorage.child("profileImageEmailUser/" + firebaseAuth.currentUser?.email)
             ref.putFile(profile)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {

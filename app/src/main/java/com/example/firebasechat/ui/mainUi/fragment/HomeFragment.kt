@@ -20,14 +20,20 @@ import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
-import com.example.firebasechat.mvvm.model.Status
-import com.example.firebasechat.mvvm.model.User
+import com.example.firebasechat.model.Status
+import com.example.firebasechat.model.User
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
 import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
+import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
+import com.example.firebasechat.utils.FirebaseInstance.firebaseStorage
+import com.example.firebasechat.utils.Response
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -40,14 +46,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import java.util.Calendar
 
+
 class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
     lateinit var adapter: UserAdapter
-    lateinit var firebaseAuth: FirebaseAuth
-    lateinit var firebaseDb: DatabaseReference
     lateinit var userList: ArrayList<User>
     lateinit var statusList: ArrayList<Status>
-    lateinit var firebaseStorage: FirebaseStorage
     lateinit var statusAdapter: StatusAdapter
 
     val CAMERA_REQ_CODE = 101
@@ -72,15 +76,9 @@ class HomeFragment : Fragment() {
 
         statusList = ArrayList()
 
-        firebaseAuth = FirebaseAuth.getInstance()
-        firebaseDb = Firebase.database.reference
-        firebaseStorage = Firebase.storage
-
         binding.progressBar.visibility = View.VISIBLE
         binding.noChat.visibility = View.GONE
-        binding.shimmerStatus.stopShimmer()
-        binding.shimmerStatus.hideShimmer()
-
+        binding.progressBarStatus.visibility = View.GONE
 
         return binding.root
     }
@@ -95,13 +93,17 @@ class HomeFragment : Fragment() {
         adapter = UserAdapter(requireContext(),userList)
         statusAdapter = StatusAdapter(requireContext(),statusList,this@HomeFragment)
 
+        binding.statusImage.setOnClickListener { viewMyStatus() }
         addStatus()
 
 
         setUserToRecyclerView()
         setStatusRecyclerView()
 
+    }
 
+    private fun viewMyStatus() {
+        findNavController().navigate(R.id.myStatusFragment)
     }
 
     private fun setStatusRecyclerView() {
@@ -112,21 +114,26 @@ class HomeFragment : Fragment() {
         binding.recyclerViewStatus.layoutManager = layoutManager*/
         firebaseDb.child("status").child("uid").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                statusList.clear()
-                for (postSnapshot in snapshot.children){
-                    val status = postSnapshot.getValue(Status::class.java)
-                    if (firebaseAuth.currentUser!!.uid != status!!.id){
-                        statusList.add(status)
+                try {
+                    statusList.clear()
+                    for (postSnapshot in snapshot.children){
+                        val status = postSnapshot.getValue(Status::class.java)
+                        if (firebaseAuth.currentUser!!.uid != status!!.id){
+                            statusList.add(status)
+                        }
+                        val resourceId = status.statusUrl
+                        Glide.with(requireContext()).load(resourceId).into(binding.statusImage)
+                        binding.recyclerViewStatus.adapter = statusAdapter
+                        statusAdapter.setData(statusList)
                     }
-                    binding.recyclerViewStatus.adapter = statusAdapter
-                    statusAdapter.setData(statusList)
+                }
+                catch (e: Exception){
+                    e.printStackTrace()
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 Log.e("err",error.message)
             }
-
         })
     }
 
@@ -303,20 +310,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun success() {
-
-        binding.shimmerStatus.visibility = View.VISIBLE
-        binding.shimmerStatus.startShimmer()
-
-        /*val email = firebaseAuth.currentUser?.email.toString()
-        val dtForm: DateFormat = SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.")
-        val date: String = dtForm.format(Calendar.getInstance().time)
-        val fileName = date + FirebaseAuth.getInstance().currentUser!!.uid*/
+        binding.progressBarStatus.visibility = View.VISIBLE
         val email = firebaseAuth.currentUser?.email.toString()
-
         val dateTime = Utils.dateTime(Calendar.getInstance())
         val id = firebaseAuth.currentUser!!.uid
         if (status != null){
-            val ref = firebaseStorage.reference.child("status/").child(email).child("status/$dateTime")
+            val ref = firebaseStorage.child("status/").child(email).child("status/$dateTime")
             ref.putFile(status!!)
                 .addOnSuccessListener {
                     ref.downloadUrl
@@ -324,15 +323,14 @@ class HomeFragment : Fragment() {
                             path = it.toString()
                             val usrName = user!!.name
                             val profileImage = user!!.pic
-                            //val dateTime = Utils.dateTime(Calendar.getInstance())
                             val status = Status(id,path,usrName,profileImage,dateTime)
                             firebaseDb.child("status").child("uid").push().setValue(status)
-                            binding.shimmerStatus.visibility = View.GONE
-                            binding.shimmerStatus.stopShimmer()
+                            binding.progressBarStatus.visibility = View.GONE
                         }
                         .addOnFailureListener {
                             Log.e("err",it.message.toString())
                             Utils.createToast(App.context(), "Try again")
+                            binding.progressBarStatus.visibility = View.GONE
                         }
                 }
         }

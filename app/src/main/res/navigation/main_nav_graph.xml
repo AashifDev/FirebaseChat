@@ -25,4 +25,9 @@
         android:name="com.example.firebasechat.ui.mainUi.fragment.ViewStatusFragment"
         android:label="fragment_view_status"
         tools:layout="@layout/fragment_view_status" />
+    <fragment
+        android:id="@+id/myStatusFragment"
+        android:name="com.example.firebasechat.ui.mainUi.fragment.MyStatusFragment"
+        android:label="fragment_my_status"
+        tools:layout="@layout/fragment_my_status" />
 </navigation>

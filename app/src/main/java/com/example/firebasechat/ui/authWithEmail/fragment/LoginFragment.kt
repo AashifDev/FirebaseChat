@@ -15,13 +15,13 @@ import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 
 
 class LoginFragment : Fragment() {
     lateinit var binding: FragmentLoginBinding
-    lateinit var firebaseAuth: FirebaseAuth
     private var email = ""
     var password = ""
     override fun onCreateView(

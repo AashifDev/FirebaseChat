@@ -1,6 +1,7 @@
 package com.example.firebasechat.utils
 
 import android.app.Application
+import com.google.firebase.database.FirebaseDatabase
 
 class App:Application() {
     init {
@@ -18,5 +19,6 @@ class App:Application() {
     override fun onCreate() {
         super.onCreate()
         applicationContext!!
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
     }
 }

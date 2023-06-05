@@ -22,7 +22,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentAddProfileBinding
-import com.example.firebasechat.mvvm.model.User
+import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.utils.App

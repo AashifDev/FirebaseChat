@@ -19,6 +19,7 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterWithMobileBinding
 import com.example.firebasechat.ui.authWithEmail.AuthEmailActivity
 import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -37,8 +38,8 @@ import java.util.concurrent.TimeUnit
 class RegisterWithMobileFragment : Fragment() {
     lateinit var binding: FragmentRegisterWithMobileBinding
     lateinit var editTextMobileNumber: EditText
-    lateinit var firebaseAuth: FirebaseAuth
-    lateinit var firebaseDb: DatabaseReference
+ /*   lateinit var firebaseAuth: FirebaseAuth
+    lateinit var firebaseDb: DatabaseReference*/
 
     var countryCode = ""
     var mobileNumber = ""
@@ -51,8 +52,8 @@ class RegisterWithMobileFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentRegisterWithMobileBinding.inflate(layoutInflater, container, false)
-        firebaseAuth = FirebaseAuth.getInstance()
-        firebaseDb = Firebase.database.reference
+      /*  firebaseAuth = FirebaseAuth.getInstance()
+        firebaseDb = Firebase.database.reference*/
 
         binding.inputLayoutOtp.visibility = View.GONE
         binding.textViewSubmit.visibility = View.GONE

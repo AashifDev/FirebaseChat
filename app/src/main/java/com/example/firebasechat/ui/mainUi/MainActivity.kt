@@ -16,18 +16,14 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
+import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var navController: NavController
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var firebaseDb: DatabaseReference
     lateinit var progressBar: ProgressBar
     lateinit var prefManager: PrefManager
     private lateinit var vibrator: Vibrator
@@ -42,14 +38,11 @@ class MainActivity : AppCompatActivity() {
         //Set NavHostFragment
         navController = findNavController(R.id.mainNavHostFragment)
 
-
         //Status BAr Background
         window.apply { decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR }
         window.statusBarColor = ContextCompat.getColor(this, R.color.primary)
 
-        //Initialization
-        firebaseDb = Firebase.database.reference
-        firebaseAuth = FirebaseAuth.getInstance()
+
         progressBar = findViewById(R.id.progressBar)
         prefManager = PrefManager(this)
 
@@ -83,18 +76,28 @@ class MainActivity : AppCompatActivity() {
        binding.bottomNavigation.setOnItemSelectedListener {
            when(it.itemId){
                R.id.home->{
-                   navController.navigate(R.id.homeFragment)
+                   if (!it.isChecked){
+                       navController.navigate(R.id.homeFragment)
+                   }
+
                    vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
                    vibrator.vibrate(20)
                }
                R.id.status->{
-                   navController.navigate(R.id.viewStatusFragment)
+                   if (!it.isChecked){
+                       navController.navigate(R.id.viewStatusFragment)
+                   }
+
                    vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
                    vibrator.vibrate(20)
                }
            }
            return@setOnItemSelectedListener true
        }
+
+        binding.bottomNavigation.setOnItemReselectedListener {
+            navController.popBackStack(it.itemId, inclusive = false)
+        }
 
     }
 
@@ -120,11 +123,13 @@ class MainActivity : AppCompatActivity() {
     fun showToolbarItem(){
         binding.toolbar.profileImage.visibility = View.VISIBLE
         binding.toolbar.userName.visibility = View.VISIBLE
+        binding.toolbar.back.visibility = View.VISIBLE
         binding.toolbar.userName.textSize = 15f
     }
 
     fun hideToolbarItem(){
         binding.toolbar.profileImage.visibility = View.GONE
+        binding.toolbar.back.visibility = View.GONE
         binding.toolbar.userName.setText(R.string.app_name)
         binding.toolbar.userName.textSize = 20f
     }
@@ -163,5 +168,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         hideToolbarItem()
     }
+
 
 }

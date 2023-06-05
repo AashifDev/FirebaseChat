@@ -1,7 +1,7 @@
 package com.example.firebasechat.utils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.firebasechat.mvvm.model.Status
+import com.example.firebasechat.model.Status
 
 class MyDiffUtil(
     private val oldList: ArrayList<Status>,
