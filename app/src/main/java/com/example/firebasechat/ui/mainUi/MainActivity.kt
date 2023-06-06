@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
 
 
-        //Set on click on menu itme
+        //Set on click on menu time
         binding.toolbar.toolbar.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.newMsg->{
@@ -116,7 +116,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AuthMobileActivity::class.java))
             finish()
         }
-
     }
 
 
@@ -145,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
             }else{
-            Utils.createToast(this, "Welcome Back!")
+            //Utils.createToast(this, "Welcome Back!")
         }
         /*val current = firebaseAuth.currentUser!!.getIdToken(true)
 

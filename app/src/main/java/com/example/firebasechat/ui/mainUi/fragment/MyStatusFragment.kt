@@ -13,6 +13,7 @@ import com.example.firebasechat.model.Status
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.utils.FirebaseInstance
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -52,9 +53,9 @@ class MyStatusFragment : Fragment() {
                     statusList.clear()
                     for (postSnapshot in snapshot.children){
                         val status = postSnapshot.getValue(Status::class.java)
-                        /*if (firebaseAuth.currentUser!!.uid != status!!.id){
+                        if (firebaseAuth.currentUser!!.uid != status!!.id){
                             statusList.add(status)
-                        }*/
+                        }
                         statusList.add(status!!)
                         val resourceId = status.statusUrl
                         binding.recyclerViewStatus.adapter = statusAdapter

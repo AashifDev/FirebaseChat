@@ -19,6 +19,6 @@ class App:Application() {
     override fun onCreate() {
         super.onCreate()
         applicationContext!!
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true)
     }
 }

@@ -101,6 +101,7 @@ object Utils {
         MM/dd/yyyy hh:mm:ss tt	08/05/2006 03:05:15 PM
         M/d/yy h :m:s tt	8/5/06 3:5:15 PM
         ddd MMM dd yyyy	Sat Aug 05 2006
+        "yyyy-MM-dd hh:mm:ss a"  2023-06-06 05:50:51 PM
         dddd, MMMM dd yyyy	Saturday, August 05 2006
     */
 
@@ -144,7 +145,7 @@ object Utils {
     }*/
 
     fun dateTime(calendar: Calendar): String {
-        val dtForm: DateFormat = SimpleDateFormat("dd-MMMM-yyyy",Locale.US)
+        val dtForm: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a",Locale.US)
         val date: String = dtForm.format(calendar.time)
         return date
     }

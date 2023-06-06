@@ -83,6 +83,14 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"*/
 
+    // ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+
     //Dependency Injection with hilt dagger
     implementation "com.google.dagger:hilt-android:2.44"
     kapt "com.google.dagger:hilt-android-compiler:2.44"
