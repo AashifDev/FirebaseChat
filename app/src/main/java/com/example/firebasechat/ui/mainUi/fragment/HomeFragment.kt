@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -31,8 +32,11 @@ import com.example.firebasechat.mvvm.FirebaseViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
+import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.Response
 import com.example.firebasechat.utils.Utils
+import com.example.firebasechat.utils.hide
+import com.example.firebasechat.utils.show
 
 
 class HomeFragment : Fragment() {
@@ -80,6 +84,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+
         binding.statusImage.setOnClickListener { viewMyStatus() }
         addStatus()
 
@@ -100,7 +105,7 @@ class HomeFragment : Fragment() {
         binding.recyclerViewStatus.layoutManager = layoutManager*/
 
         viewModels.getStatusFromFirebaseDb()
-        viewModels.statusLiveData.observe(viewLifecycleOwner, Observer { it ->
+        viewModels._statusLiveData.observe(viewLifecycleOwner, Observer { it ->
             /*if (!it.isNullOrEmpty()){
                 var url = ""
                 statusList.addAll(it)
@@ -115,6 +120,7 @@ class HomeFragment : Fragment() {
                     if (!it.data.isNullOrEmpty()){
                         var url = ""
                         statusList.addAll(it.data)
+                        binding.progressBarStatus.hide()
                         it.data.forEach { url = it.statusUrl.toString() }
                         Glide.with(requireContext()).load(url).into(binding.statusImage)
                         statusAdapter = StatusAdapter(requireContext(),it.data,this@HomeFragment)
@@ -123,9 +129,11 @@ class HomeFragment : Fragment() {
                     }
                 }
                 is Response.Error->{
-
+                    binding.progressBarStatus.hide()
                 }
-                is Response.Loading->{}
+                is Response.Loading->{
+                    binding.progressBarStatus.show()
+                }
             }
         })
 
@@ -156,7 +164,7 @@ class HomeFragment : Fragment() {
 
     private fun setUserToRecyclerView() {
         viewModels.getUserFromFirebaseDb()
-        viewModels.userLiveData.observe(viewLifecycleOwner, Observer {
+        viewModels._userLiveData.observe(viewLifecycleOwner, Observer {
             when(it){
                 is Response.Loading->{
                     binding.progressBar.visibility = View.GONE
@@ -177,7 +185,7 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-     /*       if (it.isNullOrEmpty()){
+           /* if (it.isNullOrEmpty()){
                 binding.progressBar.visibility = View.GONE
                 binding.noChat.visibility = View.VISIBLE
             }else{
@@ -309,7 +317,7 @@ class HomeFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun openGallery() {
         val galleryIntent = Intent(Intent.ACTION_PICK)
-        galleryIntent.type = "image/*"
+        galleryIntent.type = "image/**"
         galleryIntent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(galleryIntent, GALLERY_REQ_CODE)
 
@@ -328,7 +336,8 @@ class HomeFragment : Fragment() {
                 try {
                     val bitmap = data!!.extras!!.get("data") as Bitmap
                     status = Utils.getUriFromFile(requireContext(), bitmap)
-                    viewModels.addStatusToFirebaseDb(status!!,statusList)
+
+                    viewModels.addStatusToFirebaseDb(status!!)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -340,7 +349,7 @@ class HomeFragment : Fragment() {
                 try {
                     val bitmap = data!!.extras!!.get("data") as Bitmap
                     status = Utils.getUriFromFile(requireContext(), bitmap)
-                    viewModels.addStatusToFirebaseDb(status!!,statusList)
+                    viewModels.addStatusToFirebaseDb(status!!)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -350,7 +359,7 @@ class HomeFragment : Fragment() {
             GALLERY_REQ_CODE -> {
                 try {
                     status = data!!.data
-                    viewModels.addStatusToFirebaseDb(status!!,statusList)
+                    viewModels.addStatusToFirebaseDb(status!!)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()

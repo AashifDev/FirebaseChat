@@ -22,17 +22,17 @@ import java.util.Calendar
 class FirebaseViewModel : ViewModel() {
     val status: Uri? = null
 
-    val statusList = MutableLiveData<Response<ArrayList<Status>>>()
-    val statusLiveData: MutableLiveData<Response<ArrayList<Status>>>
-        get() = statusList
+    val _statusList = MutableLiveData<Response<ArrayList<Status>>>()
+    val _statusLiveData: MutableLiveData<Response<ArrayList<Status>>>
+        get() = _statusList
 
-    val myStatusList = MutableLiveData<Response<ArrayList<MyStatus>>>()
-    val myStatusLiveData: LiveData<Response<ArrayList<MyStatus>>>
-        get() = myStatusList
+    val _myStatusList = MutableLiveData<Response<ArrayList<MyStatus>>>()
+    val _myStatusLiveData: LiveData<Response<ArrayList<MyStatus>>>
+        get() = _myStatusList
 
-    val userList = MutableLiveData<Response<ArrayList<User>>>()
-    val userLiveData: MutableLiveData<Response<ArrayList<User>>>
-        get() = userList
+    val _userList = MutableLiveData<Response<ArrayList<User>>>()
+    val _userLiveData: MutableLiveData<Response<ArrayList<User>>>
+        get() = _userList
 
 
     fun getUserFromFirebaseDb() {
@@ -48,7 +48,7 @@ class FirebaseViewModel : ViewModel() {
                             if (firebaseAuth.currentUser?.uid != userObj?.uid) {
                                 tempList.add(userObj!!)
                             }
-                            userList.value = Response.Success(tempList)
+                            _userList.value = Response.Success(tempList)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -61,9 +61,8 @@ class FirebaseViewModel : ViewModel() {
             })
     }
 
-
     fun getStatusFromFirebaseDb() {
-        firebaseDb.child("status").child("uid").addValueEventListener(object : ValueEventListener {
+        firebaseDb.child("status").child("data").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     val temList = arrayListOf<Status>()
@@ -73,7 +72,7 @@ class FirebaseViewModel : ViewModel() {
                         if (firebaseAuth.currentUser!!.uid != statusObj!!.id) {
                             temList.add(statusObj)
                         }
-                        statusList.value = Response.Success(temList)
+                        _statusList.value = Response.Success(temList)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -86,52 +85,45 @@ class FirebaseViewModel : ViewModel() {
         })
     }
 
-    fun addStatusToFirebaseDb(status: Uri, statusList: ArrayList<Status>) {
+    fun addStatusToFirebaseDb(status: Uri) {
+        val old= ArrayList<Status>()
+        var new:Status? = null
         val email = firebaseAuth.currentUser?.email.toString()
         val dateTime = Utils.dateTime(Calendar.getInstance())
-        val id = firebaseAuth.currentUser!!.uid
-        val userName = firebaseAuth.currentUser!!.displayName.toString()
 
         val ref = firebaseStorage.child("status/").child(email).child(dateTime)
         ref.putFile(status)
             .addOnSuccessListener {
                 ref.downloadUrl
                     .addOnSuccessListener {
-                        val path = it.toString()
-                        val temList = arrayListOf<Status>()
-                        Response.Success(userList).data!!.value!!.data!!.forEach {
-                            temList.add(
-                                Status(
+                        try {
+                            val path = it.toString()
+                            val temList = arrayListOf<Status>()
+                            temList.clear()
+                            _userList.value!!.data!!.forEach {
+                                new = Status(
                                     id = it.uid,
                                     statusUrl = path,
                                     userName = it.name,
                                     userProfile = it.pic,
                                     dateTime = dateTime
                                 )
-                            )
+                            }
+                            old.add(new!!)
+                            _statusList.value = Response.Success(old)
+                            firebaseDb.child("status").child("data").push().setValue(new)
+                            Utils.createToast(App.context(), "Uploaded")
+                        }catch (e:Exception){
+                            e.printStackTrace()
                         }
-                      /*  userList.value!!.forEach {
-                            temList.add(
-                                Status(
-                                    id = it.uid,
-                                    statusUrl = path,
-                                    userName = it.name,
-                                    userProfile = it.pic,
-                                    dateTime = dateTime
-                                )
-                            )
-                        }*/
 
-                        statusList.addAll(temList)
-                        firebaseDb.child("status").child("uid").push().setValue(statusList)
-                        Utils.createToast(App.context(),"Uploaded")
                     }
                     .addOnFailureListener {
-                        Utils.createToast(App.context(),"Failed")
+                        Utils.createToast(App.context(), "Try after some time!!")
                     }
             }
             .addOnFailureListener {
-                Utils.createToast(App.context(),"Failed")
+                Utils.createToast(App.context(), "Try after some time!!")
             }
     }
 }

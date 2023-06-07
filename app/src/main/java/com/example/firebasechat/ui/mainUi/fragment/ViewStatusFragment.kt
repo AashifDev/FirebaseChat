@@ -6,13 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewStatusBinding
 import com.example.firebasechat.model.Status
+import com.example.firebasechat.mvvm.FirebaseViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
+import com.example.firebasechat.utils.Response
+import com.example.firebasechat.utils.hide
+import com.example.firebasechat.utils.show
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -27,6 +33,7 @@ class ViewStatusFragment : Fragment() {
     lateinit var binding: FragmentViewStatusBinding
     lateinit var statusList: ArrayList<Status>
     lateinit var adapter: StatusAdapter
+    private val viewModel by viewModels<FirebaseViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,6 +42,8 @@ class ViewStatusFragment : Fragment() {
         binding = FragmentViewStatusBinding.inflate(layoutInflater, container, false)
 
         statusList = ArrayList()
+        binding.progressBar.show()
+        binding.noStatus.hide()
 
         return binding.root
     }
@@ -44,13 +53,37 @@ class ViewStatusFragment : Fragment() {
         binding.userProfile.setOnClickListener{
 
         }
-        adapter = StatusAdapter(requireContext(), statusList,this)
+
 
         setStatusToRecyclerView()
     }
 
     private fun setStatusToRecyclerView() {
-        firebaseDb.child("status").child("uid").addValueEventListener(object : ValueEventListener {
+        viewModel.getStatusFromFirebaseDb()
+        viewModel._statusLiveData.observe(viewLifecycleOwner){
+            when(it){
+                is Response.Success->{
+                    if (it.data.isNullOrEmpty()){
+                        binding.noStatus.show()
+                    }else{
+                        statusList.addAll(it.data)
+                        binding.progressBar.hide()
+                        adapter = StatusAdapter(requireContext(), statusList,this)
+                        binding.recyclerViewStatus.adapter = adapter
+                        adapter.setData(it.data)
+                    }
+                }
+                is Response.Error->{
+                    Log.e("err",it.errorMessage.toString())
+                }
+                is Response.Loading->{
+                    binding.progressBar.show()
+                    binding.noStatus.hide()
+                }
+            }
+
+        }
+        /*firebaseDb.child("status").child("data").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 statusList.clear()
                 for (postSnapshot in snapshot.children){
@@ -67,7 +100,7 @@ class ViewStatusFragment : Fragment() {
                 Log.e("err",error.message)
             }
 
-        })
+        })*/
     }
 
     override fun onStart() {
