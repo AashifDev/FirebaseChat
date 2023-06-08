@@ -6,32 +6,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewSendMessageBinding
 import com.example.firebasechat.model.Message
+import com.example.firebasechat.mvvm.MessageViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.MessageAdapter
+import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
+import com.example.firebasechat.utils.Response
+import com.example.firebasechat.utils.hide
+import com.example.firebasechat.utils.show
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 
 class ViewSendMessageFragment : Fragment() {
     lateinit var binding: FragmentViewSendMessageBinding
     lateinit var adapter: MessageAdapter
     lateinit var msgList: ArrayList<Message>
-    /*lateinit var firebaseAuth: FirebaseAuth
-    lateinit var firebaseDb: DatabaseReference*/
 
     var senderRoom:String? = null
     var receiverRoom:String? = null
 
+
+    private val viewModel by viewModels<MessageViewModel>()
 
     var userName = ""
     var picUrl = ""
@@ -76,11 +81,13 @@ class ViewSendMessageFragment : Fragment() {
 
         binding.send.setOnClickListener {
             if (validMessage()){
-                sendMessage()
+                viewModel.sendMessage(message, senderUid)
+                binding.editTextWriteMessage.text?.clear()
             }
         }
 
         setDataToRecyclerView()
+
 
     }
 
@@ -93,39 +100,34 @@ class ViewSendMessageFragment : Fragment() {
     }
 
     private fun setDataToRecyclerView() {
-        firebaseDb.child("chats").child(senderRoom!!).child("messages")
-            .addValueEventListener(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    msgList.clear()
-                    for (postSnapshot in snapshot.children){
-                        val message = postSnapshot.getValue(Message::class.java)
-                        msgList.add(message!!)
-                        adapter = MessageAdapter(requireContext(),msgList)
+
+
+        viewModel.addMessageToFirebaseDb(senderUid,receiverUid)
+        viewModel._messageLiveData.observe(viewLifecycleOwner, Observer { it ->
+            when(it){
+                is Response.Success->{
+                    if (!it.data.isNullOrEmpty()){
+                        msgList.addAll(it.data)
+                        adapter = MessageAdapter(requireContext(),it.data)
                         binding.recyclerViewMessage.adapter = adapter
+                        adapter.notifyItemInserted(msgList.size)
+                        binding.recyclerViewMessage.scrollToPosition(adapter.msgList.size - 1)
                     }
-                    adapter.notifyDataSetChanged()
                 }
+                is Response.Error->{
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("err",error.message)
                 }
-            })
-    }
+                is Response.Loading->{
 
-    private fun sendMessage() {
-        val msg = Message(message,senderUid)
-        firebaseDb.child("chats").child(senderRoom!!).child("messages").push()
-            .setValue(msg)
-            .addOnSuccessListener {
-                firebaseDb.child("chats").child(receiverRoom!!).child("messages").push().setValue(msg)
+                }
             }
-        binding.editTextWriteMessage.text?.clear()
+        })
     }
-
 
     override fun onStart() {
         super.onStart()
         (requireActivity() as MainActivity).showToolbarItem()
+        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.GONE
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
 
     }
@@ -133,18 +135,21 @@ class ViewSendMessageFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.VISIBLE
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
     override fun onStop() {
         super.onStop()
         (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.VISIBLE
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
     override fun onDestroy() {
         super.onDestroy()
         (requireActivity() as MainActivity).hideToolbarItem()
+        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.VISIBLE
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 

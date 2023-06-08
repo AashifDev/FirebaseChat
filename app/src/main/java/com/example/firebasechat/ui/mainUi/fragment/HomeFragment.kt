@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +20,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -28,10 +28,14 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
-import com.example.firebasechat.mvvm.FirebaseViewModel
+import com.example.firebasechat.mvvm.StatusViewModel
+import com.example.firebasechat.mvvm.UserViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
+import com.example.firebasechat.utils.Constant.CAMERA_REQ_CODE
+import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
+import com.example.firebasechat.utils.Constant.VIDEO_REQ_CODE
 import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.Response
 import com.example.firebasechat.utils.Utils
@@ -45,16 +49,12 @@ class HomeFragment : Fragment() {
     lateinit var userList: ArrayList<User>
     lateinit var statusList: ArrayList<Status>
     lateinit var statusAdapter: StatusAdapter
-    private val viewModels by viewModels<FirebaseViewModel>()
-
-    val CAMERA_REQ_CODE = 101
-    val GALLERY_REQ_CODE = 102
-    val VIDEO_REQ_CODE = 103
+    private val userViewModel by viewModels<UserViewModel>()
+    private val statusViewModel by viewModels<StatusViewModel>()
 
     var uid:String? = null
     var profile: Uri? = null
     var status: Uri? = null
-    var statuss: Status? = null
     var path = ""
     var user: User? = null
     var file: Uri? = null
@@ -82,11 +82,13 @@ class HomeFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
+        binding.progressBarStatus.hide()
 
         binding.statusImage.setOnClickListener { viewMyStatus() }
-        addStatus()
+
+        binding.addStatus.setOnClickListener {
+            uploadStatus()
+        }
 
         setUserToRecyclerView()
         setStatusRecyclerView()
@@ -98,23 +100,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setStatusRecyclerView() {
-        /*val layoutManager = LinearLayoutManager(App.context())
-        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        layoutManager.stackFromEnd = true
-        layoutManager.reverseLayout = true
-        binding.recyclerViewStatus.layoutManager = layoutManager*/
-
-        viewModels.getStatusFromFirebaseDb()
-        viewModels._statusLiveData.observe(viewLifecycleOwner, Observer { it ->
-            /*if (!it.isNullOrEmpty()){
-                var url = ""
-                statusList.addAll(it)
-                it.forEach { url = it.statusUrl.toString() }
-                Glide.with(requireContext()).load(url).into(binding.statusImage)
-                statusAdapter = StatusAdapter(requireContext(),it,this@HomeFragment)
-                binding.recyclerViewStatus.adapter = statusAdapter
-                statusAdapter.setData(it)
-            }*/
+        statusViewModel.getStatusFromFirebaseDb()
+        statusViewModel._statusLiveData.observe(viewLifecycleOwner){ it ->
             when(it){
                 is Response.Success->{
                     if (!it.data.isNullOrEmpty()){
@@ -123,7 +110,7 @@ class HomeFragment : Fragment() {
                         binding.progressBarStatus.hide()
                         it.data.forEach { url = it.statusUrl.toString() }
                         Glide.with(requireContext()).load(url).into(binding.statusImage)
-                        statusAdapter = StatusAdapter(requireContext(),it.data,this@HomeFragment)
+                        statusAdapter = StatusAdapter(requireContext(),it.data,this)
                         binding.recyclerViewStatus.adapter = statusAdapter
                         statusAdapter.setData(it.data)
                     }
@@ -132,39 +119,15 @@ class HomeFragment : Fragment() {
                     binding.progressBarStatus.hide()
                 }
                 is Response.Loading->{
-                    binding.progressBarStatus.show()
+                    binding.progressBarStatus.visibility = View.VISIBLE
                 }
             }
-        })
-
-        /*firebaseDb.child("status").child("uid").addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                try {
-                    statusList.clear()
-                    for (postSnapshot in snapshot.children){
-                        val status = postSnapshot.getValue(Status::class.java)
-                        if (firebaseAuth.currentUser!!.uid != status!!.id){
-                            statusList.add(status)
-                        }
-                        val resourceId = status.statusUrl
-                        Glide.with(requireContext()).load(resourceId).into(binding.statusImage)
-                        binding.recyclerViewStatus.adapter = statusAdapter
-                        statusAdapter.setData(statusList)
-                    }
-                }
-                catch (e: Exception){
-                    e.printStackTrace()
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("err",error.message)
-            }
-        })*/
+        }
     }
 
     private fun setUserToRecyclerView() {
-        viewModels.getUserFromFirebaseDb()
-        viewModels._userLiveData.observe(viewLifecycleOwner, Observer {
+        userViewModel.getUserFromFirebaseDb()
+        userViewModel._userLiveData.observe(viewLifecycleOwner, Observer {
             when(it){
                 is Response.Loading->{
                     binding.progressBar.visibility = View.GONE
@@ -181,58 +144,10 @@ class HomeFragment : Fragment() {
                         userList.addAll(it.data)
                         adapter = UserAdapter(requireContext(),it.data)
                         binding.recyclerViewUser.adapter = adapter
-
                     }
                 }
             }
-           /* if (it.isNullOrEmpty()){
-                binding.progressBar.visibility = View.GONE
-                binding.noChat.visibility = View.VISIBLE
-            }else{
-                binding.progressBar.visibility = View.GONE
-                binding.noChat.visibility = View.GONE
-
-                userList.addAll(it)
-                adapter = UserAdapter(requireContext(),it)
-                binding.recyclerViewUser.adapter = adapter
-            }*/
-
         })
-
-        /*firebaseDb.child("user").addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                userList.clear()
-                for (postSnapShot in snapshot.children) {
-                    user = postSnapShot.getValue(User::class.java)
-                    //current user will not show in list
-                    if (firebaseAuth.currentUser?.uid != user?.uid){
-                        userList.add(user!!)
-                    }
-                    if (userList.isEmpty()){
-                        binding.progressBar.visibility = View.GONE
-                        binding.noChat.visibility = View.VISIBLE
-                    }else{
-                        binding.progressBar.visibility = View.GONE
-                        binding.noChat.visibility = View.GONE
-                    }
-                    binding.recyclerViewUser.adapter = adapter
-                }
-                adapter.notifyDataSetChanged()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("err",error.message)
-                binding.progressBar.visibility = View.GONE
-            }
-
-        })*/
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun addStatus() {
-        binding.addStatus.setOnClickListener {
-            uploadStatus()
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -336,8 +251,7 @@ class HomeFragment : Fragment() {
                 try {
                     val bitmap = data!!.extras!!.get("data") as Bitmap
                     status = Utils.getUriFromFile(requireContext(), bitmap)
-
-                    viewModels.addStatusToFirebaseDb(status!!)
+                    statusViewModel.addStatusToFirebaseDb(status!!,userList)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -349,7 +263,7 @@ class HomeFragment : Fragment() {
                 try {
                     val bitmap = data!!.extras!!.get("data") as Bitmap
                     status = Utils.getUriFromFile(requireContext(), bitmap)
-                    viewModels.addStatusToFirebaseDb(status!!)
+                    statusViewModel.addStatusToFirebaseDb(status!!,userList)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -359,7 +273,7 @@ class HomeFragment : Fragment() {
             GALLERY_REQ_CODE -> {
                 try {
                     status = data!!.data
-                    viewModels.addStatusToFirebaseDb(status!!)
+                    statusViewModel.addStatusToFirebaseDb(status!!, userList)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -368,37 +282,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /*private fun success() {
-        binding.progressBarStatus.visibility = View.VISIBLE
-        val email = firebaseAuth.currentUser?.email.toString()
-        val dateTime = Utils.dateTime(Calendar.getInstance())
-        val id = firebaseAuth.currentUser!!.uid
-        if (status != null){
-            val ref = firebaseStorage.child("status/").child(email).child("status/$dateTime")
-            ref.putFile(status!!)
-                .addOnSuccessListener {
-                    ref.downloadUrl
-                        .addOnSuccessListener {
-                            path = it.toString()
-                            val usrName = user!!.name
-                            val profileImage = user!!.pic
-                            val status = Status(id,path,usrName,profileImage,dateTime)
-                            firebaseDb.child("status").child("uid").push().setValue(status)
-                            binding.progressBarStatus.visibility = View.GONE
-                        }
-                        .addOnFailureListener {
-                            Log.e("err",it.message.toString())
-                            Utils.createToast(App.context(), "Try again")
-                            binding.progressBarStatus.visibility = View.GONE
-                        }
-                }
-        }
-    }*/
-
     override fun onStart() {
         super.onStart()
         (requireActivity() as MainActivity).hideToolbarItem()
-
     }
 
     override fun onPause() {

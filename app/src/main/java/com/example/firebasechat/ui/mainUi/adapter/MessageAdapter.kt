@@ -5,9 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.firebasechat.R
 import com.example.firebasechat.model.Message
+import com.example.firebasechat.model.Status
+import com.example.firebasechat.utils.MyDiffUtil
 import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdapter(val context: Context, val msgList: ArrayList<Message>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){

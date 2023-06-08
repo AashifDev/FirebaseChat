@@ -6,14 +6,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentMyStatusBinding
 import com.example.firebasechat.model.Status
+import com.example.firebasechat.mvvm.StatusViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
+import com.example.firebasechat.utils.Response
+import com.example.firebasechat.utils.hide
+import com.example.firebasechat.utils.show
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -22,6 +28,7 @@ class MyStatusFragment : Fragment() {
     lateinit var binding: FragmentMyStatusBinding
     lateinit var statusList: ArrayList<Status>
     lateinit var statusAdapter: StatusAdapter
+    private val statusViewModel by viewModels<StatusViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,12 +48,29 @@ class MyStatusFragment : Fragment() {
     }
 
     private fun setStatusRecyclerView() {
-        /*val layoutManager = LinearLayoutManager(App.context())
-        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        layoutManager.stackFromEnd = true
-        layoutManager.reverseLayout = true
-        binding.recyclerViewStatus.layoutManager = layoutManager*/
-        FirebaseInstance.firebaseDb.child("status").child("uid").addValueEventListener(object :
+        statusViewModel.getStatusFromFirebaseDb()
+        statusViewModel._statusLiveData.observe(viewLifecycleOwner, Observer { it ->
+            when(it){
+                is Response.Success->{
+                    if (!it.data.isNullOrEmpty()){
+                        var url = ""
+                        statusList.addAll(it.data)
+                        //binding.progressBarStatus.hide()
+                        //Glide.with(requireContext()).load(url).into(binding.statusImage)
+                        statusAdapter = StatusAdapter(requireContext(),it.data, this)
+                        binding.recyclerViewStatus.adapter = statusAdapter
+                        statusAdapter.setData(it.data)
+                    }
+                }
+                is Response.Error->{
+                    //binding.progressBarStatus.hide()
+                }
+                is Response.Loading->{
+                    //binding.progressBarStatus.show()
+                }
+            }
+        })
+        FirebaseInstance.firebaseDb.child("status").child("data").addValueEventListener(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {

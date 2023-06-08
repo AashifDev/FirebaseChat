@@ -7,33 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewStatusBinding
 import com.example.firebasechat.model.Status
-import com.example.firebasechat.mvvm.FirebaseViewModel
+import com.example.firebasechat.mvvm.StatusViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
-import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
-import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Response
 import com.example.firebasechat.utils.hide
 import com.example.firebasechat.utils.show
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
 
 class ViewStatusFragment : Fragment() {
     lateinit var binding: FragmentViewStatusBinding
     lateinit var statusList: ArrayList<Status>
     lateinit var adapter: StatusAdapter
-    private val viewModel by viewModels<FirebaseViewModel>()
+    private val viewModel by viewModels<StatusViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

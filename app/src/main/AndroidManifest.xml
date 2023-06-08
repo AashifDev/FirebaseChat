@@ -49,7 +49,6 @@
         <activity
             android:name=".ui.mainUi.MainActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="locked"/>
     </application>
 

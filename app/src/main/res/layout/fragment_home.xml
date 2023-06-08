@@ -31,16 +31,15 @@
                 app:layout_constraintStart_toStartOf="@id/recyclerViewUser"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/linearLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:layout_marginBottom="6dp"
                     android:elevation="0dp"
-                    app:layout_constraintEnd_toEndOf="@+id/recyclerViewUser"
-                    app:layout_constraintStart_toStartOf="@+id/recyclerViewUser"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/myStatus"
@@ -114,17 +113,14 @@
                         android:id="@+id/recyclerViewStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start"
                         android:layout_marginStart="3dp"
                         android:orientation="horizontal"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_constraintBottom_toBottomOf="@id/myStatus"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/myStatus"
-                        app:layout_constraintTop_toTopOf="@id/myStatus"
+                        app:reverseLayout="true"
+                        app:stackFromEnd="true"
                         tools:listitem="@layout/user_status_single_item" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
             </HorizontalScrollView>
 
