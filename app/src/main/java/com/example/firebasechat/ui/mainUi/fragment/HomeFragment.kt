@@ -251,7 +251,7 @@ class HomeFragment : Fragment() {
                 try {
                     val bitmap = data!!.extras!!.get("data") as Bitmap
                     status = Utils.getUriFromFile(requireContext(), bitmap)
-                    statusViewModel.addStatusToFirebaseDb(status!!,userList)
+                    //statusViewModel.addStatusToFirebaseDb(status!!,userList)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -263,7 +263,7 @@ class HomeFragment : Fragment() {
                 try {
                     val bitmap = data!!.extras!!.get("data") as Bitmap
                     status = Utils.getUriFromFile(requireContext(), bitmap)
-                    statusViewModel.addStatusToFirebaseDb(status!!,userList)
+                    //statusViewModel.addStatusToFirebaseDb(status!!,userList)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -273,7 +273,7 @@ class HomeFragment : Fragment() {
             GALLERY_REQ_CODE -> {
                 try {
                     status = data!!.data
-                    statusViewModel.addStatusToFirebaseDb(status!!, userList)
+                    statusViewModel.addStatusToFirebaseDb(status!!)
                     profileImage = true
                 } catch (e: Exception) {
                     e.printStackTrace()
