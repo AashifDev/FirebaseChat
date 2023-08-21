@@ -7,27 +7,31 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.HomeFragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home"
+        android:label="@null"/>
     <fragment
         android:id="@+id/viewSendMessageFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ViewSendMessageFragment"
-        tools:layout="@layout/fragment_view_send_message" />
+        tools:layout="@layout/fragment_view_send_message"
+        android:label="@null"/>
     <fragment
         android:id="@+id/newMessageFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment"
-        tools:layout="@layout/fragment_new_message" />
+        tools:layout="@layout/fragment_new_message"
+        android:label="@null"/>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ProfileFragment"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile"
+        android:label="@null"/>
     <fragment
         android:id="@+id/viewStatusFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ViewStatusFragment"
-        android:label="fragment_view_status"
-        tools:layout="@layout/fragment_view_status" />
+        tools:layout="@layout/fragment_view_status"
+        android:label="@null"/>
     <fragment
         android:id="@+id/myStatusFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.MyStatusFragment"
-        android:label="fragment_my_status"
+        android:label="@null"
         tools:layout="@layout/fragment_my_status" />
 </navigation>

@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -50,6 +52,13 @@
             android:name=".ui.mainUi.MainActivity"
             android:exported="false"
             android:screenOrientation="locked"/>
+        <!--<service
+            android:name=".fcm.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>-->
     </application>
 
 </manifest>

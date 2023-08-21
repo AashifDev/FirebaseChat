@@ -1,5 +1,4 @@
 package com.example.firebasechat.model
-
 data class MyStatus(
     val id:String? = null,
     val statusUrl:String? = null,

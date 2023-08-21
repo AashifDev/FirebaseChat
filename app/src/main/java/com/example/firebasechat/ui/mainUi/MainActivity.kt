@@ -12,6 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
 import com.example.firebasechat.session.PrefManager
@@ -19,13 +23,16 @@ import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    lateinit var navController: NavController
     lateinit var progressBar: ProgressBar
     lateinit var prefManager: PrefManager
+    lateinit var appBarConfiguration: AppBarConfiguration
+    lateinit var bottomNavigationView: BottomNavigationView
+    lateinit var navController: NavController
     private lateinit var vibrator: Vibrator
 
     @SuppressLint("MissingInflatedId")
@@ -33,10 +40,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.title = "ChitChat"
+
+        bottomNavigationView = findViewById(R.id.bottomNavigation)
+
         //Set NavHostFragment
         navController = findNavController(R.id.mainNavHostFragment)
+
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment,R.id.viewStatusFragment))
+        bottomNavigationView.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
         //Status BAr Background
         window.apply { decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR }
@@ -75,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         //Bottom NavigationView
        binding.bottomNavigation.setOnItemSelectedListener {
            when(it.itemId){
-               R.id.home->{
+               R.id.homeFragment->{
                    if (!it.isChecked){
                        navController.navigate(R.id.homeFragment)
                    }
@@ -83,22 +97,21 @@ class MainActivity : AppCompatActivity() {
                    vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
                    vibrator.vibrate(20)
                }
-               R.id.status->{
+               R.id.viewStatusFragment->{
                    if (!it.isChecked){
                        navController.navigate(R.id.viewStatusFragment)
                    }
-
                    vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
                    vibrator.vibrate(20)
                }
            }
            return@setOnItemSelectedListener true
        }
+    }
 
-        binding.bottomNavigation.setOnItemReselectedListener {
-            navController.popBackStack(it.itemId, inclusive = false)
-        }
-
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.mainNavHostFragment)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -122,13 +135,13 @@ class MainActivity : AppCompatActivity() {
     fun showToolbarItem(){
         binding.toolbar.profileImage.visibility = View.VISIBLE
         binding.toolbar.userName.visibility = View.VISIBLE
-        binding.toolbar.back.visibility = View.VISIBLE
-        binding.toolbar.userName.textSize = 15f
+        //binding.toolbar.//back.visibility = View.VISIBLE
+        //binding.toolbar.userName.textSize = 15f
     }
 
     fun hideToolbarItem(){
         binding.toolbar.profileImage.visibility = View.GONE
-        binding.toolbar.back.visibility = View.GONE
+       // binding.toolbar.back.visibility = View.GONE
         binding.toolbar.userName.setText(R.string.app_name)
         binding.toolbar.userName.textSize = 20f
     }
@@ -146,15 +159,6 @@ class MainActivity : AppCompatActivity() {
             }else{
             //Utils.createToast(this, "Welcome Back!")
         }
-        /*val current = firebaseAuth.currentUser!!.getIdToken(true)
-
-        current.addOnSuccessListener {
-            val intent = Intent(this, AuthMobileActivity::class.java)
-            startActivity(intent)
-            finish()
-        }.addOnFailureListener {
-            Log.e("err",it.message.toString())
-        }*/
         Log.d("tag", current.toString())
     }
 

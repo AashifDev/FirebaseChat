@@ -116,8 +116,9 @@ class RegisterFragment : Fragment() {
         mobileNumber: String?
     ) {
         uid = firebaseAuth.currentUser?.uid.toString()
-        if (profile != null){
-            val ref = firebaseStorage.child("profileImageEmailUser/" + firebaseAuth.currentUser?.email)
+        if (profile != null) {
+            val ref =
+                firebaseStorage.child("profileImageEmailUser/" + firebaseAuth.currentUser?.email)
             ref.putFile(profile)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {

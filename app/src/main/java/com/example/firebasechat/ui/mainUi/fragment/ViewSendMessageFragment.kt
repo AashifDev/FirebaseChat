@@ -1,14 +1,19 @@
 package com.example.firebasechat.ui.mainUi.fragment
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentViewSendMessageBinding
@@ -16,15 +21,12 @@ import com.example.firebasechat.model.Message
 import com.example.firebasechat.mvvm.MessageViewModel
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.MessageAdapter
-import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Response
-import com.example.firebasechat.utils.hide
-import com.example.firebasechat.utils.show
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 
 
 class ViewSendMessageFragment : Fragment() {
@@ -89,7 +91,10 @@ class ViewSendMessageFragment : Fragment() {
         setDataToRecyclerView()
 
 
+
     }
+
+
 
     private fun validMessage(): Boolean {
         message = binding.editTextWriteMessage.text.toString()

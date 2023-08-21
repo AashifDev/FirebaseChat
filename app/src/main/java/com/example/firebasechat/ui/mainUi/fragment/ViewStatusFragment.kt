@@ -54,11 +54,17 @@ class ViewStatusFragment : Fragment() {
                     if (it.data.isNullOrEmpty()){
                         binding.noStatus.show()
                     }else{
-                        statusList.addAll(it.data)
+                        val id = it.data.forEach { it.id }
+                        statusList.filter {
+                            if (!it.equals(id)){
+                                statusList.add(it)
+                            }
+                            true
+                        }
                         binding.progressBar.hide()
                         adapter = StatusAdapter(requireContext(), statusList,this)
                         binding.recyclerViewStatus.adapter = adapter
-                        adapter.setData(it.data)
+                        //adapter.setData(it.data)
                     }
                 }
                 is Response.Error->{

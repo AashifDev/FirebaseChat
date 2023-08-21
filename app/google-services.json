@@ -1,42 +1,33 @@
 {
   "project_info": {
-    "project_number": "1003491352267",
-    "firebase_url": "https://chitchat-cc9da-default-rtdb.firebaseio.com",
-    "project_id": "chitchat-cc9da",
-    "storage_bucket": "chitchat-cc9da.appspot.com"
+    "project_number": "1011793856255",
+    "project_id": "fir-chat-7fa0e",
+    "storage_bucket": "fir-chat-7fa0e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1003491352267:android:646e1309c75683618f454e",
+        "mobilesdk_app_id": "1:1011793856255:android:352ccd12ec907494e76eca",
         "android_client_info": {
           "package_name": "com.example.firebasechat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1003491352267-5asnjme3a0497532kmalolgpr8bv34r8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.firebasechat",
-            "certificate_hash": "e8c107bfe91daf7067745cb8e02014f46ce24993"
-          }
-        },
-        {
-          "client_id": "1003491352267-clrijij2e1gpr3avma19ospu9kijug1h.apps.googleusercontent.com",
+          "client_id": "1011793856255-7getvq9mcub1uku72p7edvshepgtn3vl.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCQ1UaBeR0apTeyZO4rkpqXhl9DjCq3JJE"
+          "current_key": "AIzaSyCdb_J0f2-JFK145rriZvIrZN3Cp-bzmk0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1003491352267-clrijij2e1gpr3avma19ospu9kijug1h.apps.googleusercontent.com",
+              "client_id": "1011793856255-7getvq9mcub1uku72p7edvshepgtn3vl.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
