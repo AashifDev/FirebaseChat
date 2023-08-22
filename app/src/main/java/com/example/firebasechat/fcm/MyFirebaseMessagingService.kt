@@ -15,8 +15,7 @@ import com.example.firebasechat.utils.App
 
 
 class MyFirebaseMessagingService {
-    lateinit var builder: Notification.Builder
-    var msg: String? = null
+
     var channelId: String = "my_channel_id"
 
     //Default fcm
@@ -30,7 +29,7 @@ class MyFirebaseMessagingService {
             val channel = NotificationChannel(
                 channelId,
                 "My Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
         }
@@ -50,6 +49,7 @@ class MyFirebaseMessagingService {
             .setContentTitle("New Message")
             .setContentText(message)
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
         // Show the notification.
         val notificationId = 0 // You can use a unique ID for each notification.

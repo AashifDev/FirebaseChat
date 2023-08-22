@@ -5,6 +5,7 @@ data class User (
     var email:String? = null,
     var uid:String? = null,
     var mobileNumber:String? = null,
-    var pic:String? = null
+    var pic:String? = null,
+    var isActive:Boolean = false
     )
 

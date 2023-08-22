@@ -123,7 +123,7 @@ class RegisterFragment : Fragment() {
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
                         val path = it.toString()
-                        val user = User(name, email, uid, mobileNumber, path)
+                        val user = User(name, email, uid, mobileNumber, path,true)
                         firebaseDb.child("user").child(uid).setValue(user)
                     }
                 }

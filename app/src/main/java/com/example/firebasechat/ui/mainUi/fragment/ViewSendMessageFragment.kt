@@ -42,6 +42,7 @@ class ViewSendMessageFragment : Fragment() {
 
     var userName = ""
     var picUrl = ""
+    var isActive: Boolean = false
     var receiverUid = ""
     var message = ""
     var senderUid = ""
@@ -55,6 +56,7 @@ class ViewSendMessageFragment : Fragment() {
         userName = arguments?.getString("userName").toString()
         receiverUid = arguments?.getString("uid").toString()
         picUrl = arguments?.getString("pic").toString()
+        isActive = arguments?.getBoolean("isActive") == true
 
         setNameAndProfilePicOnToolBar()
 
@@ -70,6 +72,9 @@ class ViewSendMessageFragment : Fragment() {
         (requireActivity() as MainActivity).binding.toolbar.userName.text = userName
         val img = (requireActivity() as MainActivity).binding.toolbar.profileImage
         Glide.with(requireContext()).load(picUrl).into(img)
+        if (isActive) (requireActivity() as MainActivity).binding.toolbar.isActive.text = "online" else (requireActivity() as MainActivity).binding.toolbar.isActive.text = "offline"
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -134,6 +139,8 @@ class ViewSendMessageFragment : Fragment() {
         (requireActivity() as MainActivity).showToolbarItem()
         (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.GONE
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
+        (requireActivity() as MainActivity).binding
+
 
     }
 

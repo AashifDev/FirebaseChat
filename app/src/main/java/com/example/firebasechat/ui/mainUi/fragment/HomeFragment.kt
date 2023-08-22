@@ -2,6 +2,7 @@ package com.example.firebasechat.ui.mainUi.fragment
 
 import MyFirebaseMessagingService
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -315,8 +316,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
@@ -344,6 +343,18 @@ class HomeFragment : Fragment() {
 
     fun getUid(uid: String?) {
         receiverUid = uid!!
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+        firebaseDb.child("user").child(uid).child("active").setValue(true)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+        firebaseDb.child("user").child(uid).child("active").setValue(false)
     }
 
 }

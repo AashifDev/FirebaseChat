@@ -19,6 +19,7 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val user:TextView = itemView.findViewById(R.id.userName)
         val profileImage: CircleImageView = itemView.findViewById(R.id.profile_image)
+        val isActive: TextView = itemView.findViewById(R.id.isActiveLogo)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,6 +36,7 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
                 putString("userName", item.name)
                 putString("uid",item.uid)
                 putString("pic",item.pic)
+                putBoolean("isActive", item.isActive)
             }
             holder.user.findNavController().navigate(R.id.viewSendMessageFragment,bundle)
         }
@@ -43,6 +45,12 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
         }
         else{
             holder.profileImage.setImageResource(R.drawable.personn)
+        }
+
+        if (item.isActive){
+            holder.isActive.visibility = View.VISIBLE
+        }else{
+            holder.isActive.visibility = View.GONE
         }
 
         listener.getUid(item.uid)
