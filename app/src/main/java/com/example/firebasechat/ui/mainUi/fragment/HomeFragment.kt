@@ -1,5 +1,6 @@
 package com.example.firebasechat.ui.mainUi.fragment
 
+import MyFirebaseMessagingService
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -27,6 +28,7 @@ import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.Services.FcmService
 import com.example.firebasechat.databinding.FragmentHomeBinding
+import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.StatusViewModel
@@ -37,9 +39,15 @@ import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
 import com.example.firebasechat.utils.Constant.CAMERA_REQ_CODE
 import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.Constant.VIDEO_REQ_CODE
+import com.example.firebasechat.utils.FirebaseInstance
+import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Response
 import com.example.firebasechat.utils.Utils
 import com.example.firebasechat.utils.hide
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 
 
 class HomeFragment : Fragment() {
@@ -58,6 +66,9 @@ class HomeFragment : Fragment() {
     var user: User? = null
     var file: Uri? = null
     var profileImage: Boolean = false
+    var senderUid:String? = null
+    var receiverUid = ""
+    var senderRoom:String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,6 +94,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.progressBarStatus.hide()
 
+
+
         binding.statusImage.setOnClickListener { viewMyStatus() }
 
         binding.addStatus.setOnClickListener {
@@ -92,6 +105,27 @@ class HomeFragment : Fragment() {
         setUserToRecyclerView()
         setStatusRecyclerView()
 
+        senderUid = FirebaseAuth.getInstance().currentUser?.uid.toString()
+
+        senderRoom = receiverUid + senderUid
+
+        firebaseDb.child("chats").child(senderRoom!!).child("messages")
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    // Handle the data that was added to the database.
+                    val value = snapshot.getValue(Message::class.java)
+                    // Trigger the notification here.
+                    val senderId = value!!.senderId
+                    if (!senderId!!.contains(FirebaseInstance.firebaseAuth.currentUser!!.uid)){
+                        MyFirebaseMessagingService().createDefaultBuilder(value.message!!)
+                    }
+                }
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onChildRemoved(snapshot: DataSnapshot) {}
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onCancelled(error: DatabaseError) {}
+
+            })
     }
 
     private fun viewMyStatus() {
@@ -141,7 +175,7 @@ class HomeFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.noChat.visibility = View.GONE
                         userList.addAll(it.data)
-                        adapter = UserAdapter(requireContext(),it.data)
+                        adapter = UserAdapter(requireContext(),it.data,this)
                         binding.recyclerViewUser.adapter = adapter
                     }
                 }
@@ -306,6 +340,10 @@ class HomeFragment : Fragment() {
         super.onDestroy()
         (requireActivity() as MainActivity).hideToolbarItem()
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
+    }
+
+    fun getUid(uid: String?) {
+        receiverUid = uid!!
     }
 
 }

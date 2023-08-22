@@ -16,7 +16,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.firebasechat.R
 
-
 class FcmService : Service(){
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val channelId =
@@ -35,7 +34,7 @@ class FcmService : Service(){
 
         startForeground(101, notification)
 
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? {

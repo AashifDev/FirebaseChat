@@ -2,23 +2,11 @@ package com.example.firebasechat.mvvm
 
 import MyFirebaseMessagingService
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
-import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.firebasechat.R
 import com.example.firebasechat.model.Message
-import com.example.firebasechat.ui.mainUi.MainActivity
-import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Response
@@ -65,7 +53,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                 }
             })
 
-        firebaseDb.child("chats").child(senderRoom!!).child("messages")
+        /*firebaseDb.child("chats").child(senderRoom!!).child("messages")
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     // Handle the data that was added to the database.
@@ -73,7 +61,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                     // Trigger the notification here.
                     val senderId = value!!.senderId
                     if (!senderId!!.contains(firebaseAuth.currentUser!!.uid)){
-                        MyFirebaseMessagingService().createDefaultBuilder(value)
+                        MyFirebaseMessagingService().creteCustomNotificationBuilder(value.message)
                     }
                 }
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -81,7 +69,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
                 override fun onCancelled(error: DatabaseError) {}
 
-            })
+            })*/
     }
 
 

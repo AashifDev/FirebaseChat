@@ -11,9 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.model.User
+import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
 import de.hdodenhof.circleimageview.CircleImageView
 
-class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
+class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:HomeFragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val user:TextView = itemView.findViewById(R.id.userName)
@@ -44,7 +45,7 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>) : Recyc
             holder.profileImage.setImageResource(R.drawable.personn)
         }
 
-
+        listener.getUid(item.uid)
 
     }
 
