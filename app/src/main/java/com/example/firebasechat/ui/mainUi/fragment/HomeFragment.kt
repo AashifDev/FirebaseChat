@@ -16,15 +16,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
+import com.example.firebasechat.Services.FcmService
 import com.example.firebasechat.databinding.FragmentHomeBinding
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
@@ -282,8 +283,10 @@ class HomeFragment : Fragment() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
+        requireActivity().startService(Intent(requireContext(),FcmService::class.java))
         (requireActivity() as MainActivity).hideToolbarItem()
         (requireActivity() as MainActivity).binding.toolbar.toolbar.title = null
     }

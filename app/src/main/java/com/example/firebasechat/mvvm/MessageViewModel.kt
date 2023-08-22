@@ -83,42 +83,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
 
             })
     }
-    /*// Function to send a notification.
-    private fun sendNotification(message: Message?) {
-        val notificationManager =App.context()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        // Create a unique notification channel for your app (required for Android 8.0 and higher).
-        val channelId = "my_channel_id"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "My Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
 
-        // Create an intent to launch your app when the user taps the notification.
-        val intent = Intent(App.context(), MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(
-            App.context(),
-            0,
-            intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Build the notification.
-        val notificationBuilder = NotificationCompat.Builder(App.context()!!, channelId)
-            .setSmallIcon(R.drawable.chat)
-            .setContentTitle("New Message")
-            .setContentText(message.toString())
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-
-        // Show the notification.
-        val notificationId = 0 // You can use a unique ID for each notification.
-        notificationManager.notify(notificationId, notificationBuilder.build())
-    }*/
 
     fun sendMessage(message: String, senderUid: String) = viewModelScope.launch {
         val msg = Message(message, senderUid)
