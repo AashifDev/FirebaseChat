@@ -49,31 +49,20 @@ class ViewStatusFragment : Fragment() {
     private fun setStatusToRecyclerView() {
         viewModel.getStatusFromFirebaseDb()
         viewModel._statusLiveData.observe(viewLifecycleOwner){
-            when(it){
-                is Response.Success->{
-                    if (it.data.isNullOrEmpty()){
-                        binding.noStatus.show()
-                    }else{
-                        val id = it.data.forEach { it.id }
-                        statusList.filter {
-                            if (!it.equals(id)){
-                                statusList.add(it)
-                            }
-                            true
-                        }
-                        binding.progressBar.hide()
-                        adapter = StatusAdapter(requireContext(), statusList,this)
-                        binding.recyclerViewStatus.adapter = adapter
-                        //adapter.setData(it.data)
+            if (it.isNullOrEmpty()){
+                binding.noStatus.show()
+            }else{
+                val id = it.forEach { it.id }
+                statusList.filter {
+                    if (!it.equals(id)){
+                        statusList.add(it)
                     }
+                    true
                 }
-                is Response.Error->{
-                    Log.e("err",it.errorMessage.toString())
-                }
-                is Response.Loading->{
-                    binding.progressBar.show()
-                    binding.noStatus.hide()
-                }
+                binding.progressBar.hide()
+                adapter = StatusAdapter(requireContext(), statusList,this)
+                binding.recyclerViewStatus.adapter = adapter
+                //adapter.setData(it.data)
             }
 
         }

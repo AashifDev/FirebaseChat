@@ -5,16 +5,15 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -29,15 +28,18 @@
         android:theme="@style/Theme.FirebaseChat"
         tools:targetApi="31">
         <activity
+            android:name=".ui.mainUi.ChatActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.authWithMobile.AuthMobileActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="locked"/>
+            android:screenOrientation="locked"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.authWithEmail.AuthEmailActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="locked"/>
+            android:screenOrientation="locked"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".splash.SplashScreenActivity"
             android:exported="true"
@@ -51,15 +53,16 @@
         <activity
             android:name=".ui.mainUi.MainActivity"
             android:exported="false"
-            android:screenOrientation="locked"/>
-        <!--<service
+            android:screenOrientation="locked" />
+        <!--
+<service
             android:name=".fcm.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service>-->
-
+        </service>
+        -->
         <service
             android:name=".Services.FcmService"
             android:exported="true" />

@@ -33,6 +33,9 @@ import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.FirebaseInstance.firebaseStorage
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.storage.StorageReference
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.Date
 
 class RegisterFragment : Fragment() {
 
@@ -60,10 +63,7 @@ class RegisterFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
-        /*firebaseAuth = FirebaseAuth.getInstance()
-        firebaseDb = Firebase.database.reference
-        firebaseStorage = Firebase.storage
-*/
+
         binding.progressCircular.visibility = View.GONE
 
         return binding.root
@@ -96,7 +96,7 @@ class RegisterFragment : Fragment() {
                     binding.progressCircular.visibility = View.GONE
                     startActivity(Intent(requireActivity(), MainActivity::class.java))
                     requireActivity().finish()
-                    addUserToFirebaseDatabase(name, email, profile, mobileNumber)
+                    addUserToFirebaseDatabase()
                     PrefManager.saveUserWithEmail(email)
                     binding.register.alpha = 1f
                 } else {
@@ -109,21 +109,26 @@ class RegisterFragment : Fragment() {
             }
     }
 
-    private fun addUserToFirebaseDatabase(
-        name: String,
-        email: String,
-        profile: Uri?,
-        mobileNumber: String?
-    ) {
+    private fun addUserToFirebaseDatabase() {
         uid = firebaseAuth.currentUser?.uid.toString()
         if (profile != null) {
             val ref =
                 firebaseStorage.child("profileImageEmailUser/" + firebaseAuth.currentUser?.email)
-            ref.putFile(profile)
+            ref.putFile(profile!!)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
                         val path = it.toString()
-                        val user = User(name, email, uid, mobileNumber, path,true)
+                        val calender = Utils.dateTime(Calendar.getInstance())
+                        val user = User(
+                            name = name,
+                            email = email,
+                            uid = uid,
+                            mobileNumber = mobileNumber,
+                            pic = path,
+                            isActive = true,
+                            lastSeen = calender,
+                            joinDate = calender
+                        )
                         firebaseDb.child("user").child(uid).setValue(user)
                     }
                 }

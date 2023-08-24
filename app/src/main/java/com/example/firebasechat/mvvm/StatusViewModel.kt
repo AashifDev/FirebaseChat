@@ -25,12 +25,12 @@ import java.util.Calendar
 
 class StatusViewModel(application: Application) : AndroidViewModel(application) {
 
-    val _myStatusList = MutableLiveData<Response<ArrayList<MyStatus>>>()
-    val _myStatusLiveData: LiveData<Response<ArrayList<MyStatus>>>
+    val _myStatusList = MutableLiveData<ArrayList<MyStatus>>()
+    val _myStatusLiveData: LiveData<ArrayList<MyStatus>>
         get() = _myStatusList
 
-    val _statusList = MutableLiveData<Response<ArrayList<Status>>>()
-    val _statusLiveData: MutableLiveData<Response<ArrayList<Status>>>
+    val _statusList = MutableLiveData<ArrayList<Status>>()
+    val _statusLiveData: MutableLiveData<ArrayList<Status>>
         get() = _statusList
 
     fun getStatusFromFirebaseDb() = viewModelScope.launch {
@@ -45,7 +45,7 @@ class StatusViewModel(application: Application) : AndroidViewModel(application) 
                         if (firebaseAuth.currentUser!!.uid != statusObj!!.id) {
                             temList.add(statusObj)
                         }
-                        _statusList.value = Response.Success(temList)
+                        _statusList.value = temList
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

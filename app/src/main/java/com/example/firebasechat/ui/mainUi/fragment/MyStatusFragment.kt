@@ -50,24 +50,14 @@ class MyStatusFragment : Fragment() {
     private fun setStatusRecyclerView() {
         statusViewModel.getStatusFromFirebaseDb()
         statusViewModel._statusLiveData.observe(viewLifecycleOwner, Observer { it ->
-            when(it){
-                is Response.Success->{
-                    if (!it.data.isNullOrEmpty()){
-                        var url = ""
-                        statusList.addAll(it.data)
-                        //binding.progressBarStatus.hide()
-                        //Glide.with(requireContext()).load(url).into(binding.statusImage)
-                        statusAdapter = StatusAdapter(requireContext(),it.data, this)
-                        binding.recyclerViewStatus.adapter = statusAdapter
-                        statusAdapter.setData(it.data)
-                    }
-                }
-                is Response.Error->{
-                    //binding.progressBarStatus.hide()
-                }
-                is Response.Loading->{
-                    //binding.progressBarStatus.show()
-                }
+            if (!it.isNullOrEmpty()){
+                var url = ""
+                statusList.addAll(it)
+                //binding.progressBarStatus.hide()
+                //Glide.with(requireContext()).load(url).into(binding.statusImage)
+                statusAdapter = StatusAdapter(requireContext(),it, this)
+                binding.recyclerViewStatus.adapter = statusAdapter
+                statusAdapter.setData(it)
             }
         })
         FirebaseInstance.firebaseDb.child("status").child("data").addValueEventListener(object :

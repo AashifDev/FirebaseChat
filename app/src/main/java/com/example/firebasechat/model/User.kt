@@ -6,6 +6,8 @@ data class User (
     var uid:String? = null,
     var mobileNumber:String? = null,
     var pic:String? = null,
-    var isActive:Boolean = false
+    var isActive:Boolean = false,
+    var lastSeen:String? = null,
+    var joinDate:String? = null
     )
 

@@ -11,6 +11,8 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -49,6 +51,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import java.util.Calendar
 
 
 class HomeFragment : Fragment() {
@@ -127,6 +130,8 @@ class HomeFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {}
 
             })
+
+
     }
 
     private fun viewMyStatus() {
@@ -136,25 +141,15 @@ class HomeFragment : Fragment() {
     private fun setStatusRecyclerView() {
         statusViewModel.getStatusFromFirebaseDb()
         statusViewModel._statusLiveData.observe(viewLifecycleOwner){ it ->
-            when(it){
-                is Response.Success->{
-                    if (!it.data.isNullOrEmpty()){
-                        var url = ""
-                        statusList.addAll(it.data)
-                        binding.progressBarStatus.hide()
-                        it.data.forEach { url = it.statusUrl.toString() }
-                        Glide.with(requireContext()).load(url).into(binding.statusImage)
-                        statusAdapter = StatusAdapter(requireContext(),it.data,this)
-                        binding.recyclerViewStatus.adapter = statusAdapter
-                        statusAdapter.setData(it.data)
-                    }
-                }
-                is Response.Error->{
-                    binding.progressBarStatus.hide()
-                }
-                is Response.Loading->{
-                    binding.progressBarStatus.visibility = View.VISIBLE
-                }
+            if (!it.isNullOrEmpty()){
+                var url = ""
+                statusList.addAll(it)
+                binding.progressBarStatus.hide()
+                it.forEach { url = it.statusUrl.toString() }
+                Glide.with(requireContext()).load(url).into(binding.statusImage)
+                statusAdapter = StatusAdapter(requireContext(),it,this)
+                binding.recyclerViewStatus.adapter = statusAdapter
+                statusAdapter.setData(it)
             }
         }
     }
@@ -162,24 +157,19 @@ class HomeFragment : Fragment() {
     private fun setUserToRecyclerView() {
         userViewModel.getUserFromFirebaseDb()
         userViewModel._userLiveData.observe(viewLifecycleOwner, Observer {
-            when(it){
-                is Response.Loading->{
-                    binding.progressBar.visibility = View.GONE
-                    binding.noChat.visibility = View.VISIBLE
-                }
-                is Response.Error->{
-                    binding.progressBar.visibility = View.GONE
-                    binding.noChat.visibility = View.VISIBLE
-                }
-                is Response.Success->{
-                    if (!it.data.isNullOrEmpty()){
-                        binding.progressBar.visibility = View.GONE
-                        binding.noChat.visibility = View.GONE
-                        userList.addAll(it.data)
-                        adapter = UserAdapter(requireContext(),it.data,this)
-                        binding.recyclerViewUser.adapter = adapter
-                    }
-                }
+            if (!it.isNullOrEmpty()){
+                binding.progressBar.visibility = View.GONE
+                binding.noChat.visibility = View.GONE
+                userList.addAll(it)
+                adapter = UserAdapter(requireContext(),it,this)
+                binding.recyclerViewUser.adapter = adapter
+                /*val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+                if (uid != null){
+                    firebaseDb.child("user").child(uid).child("active").setValue(true)
+                }*/
+            }else{
+                binding.progressBar.visibility = View.GONE
+                binding.noChat.visibility = View.VISIBLE
             }
         })
     }
@@ -316,9 +306,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
+
         requireActivity().startService(Intent(requireContext(),FcmService::class.java))
         (requireActivity() as MainActivity).hideToolbarItem()
         (requireActivity() as MainActivity).binding.toolbar.toolbar.title = null
@@ -337,6 +327,11 @@ class HomeFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        /*val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+        val lastSeen = Utils.dateTime(Calendar.getInstance())
+        firebaseDb.child("user").child(uid).child("active").setValue(false)
+        firebaseDb.child("user").child(uid).child("lastSeen").setValue(lastSeen)
+*/
         (requireActivity() as MainActivity).hideToolbarItem()
         (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
@@ -345,16 +340,5 @@ class HomeFragment : Fragment() {
         receiverUid = uid!!
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
-        firebaseDb.child("user").child(uid).child("active").setValue(true)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
-        firebaseDb.child("user").child(uid).child("active").setValue(false)
-    }
 
 }

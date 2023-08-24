@@ -135,14 +135,17 @@ class MainActivity : AppCompatActivity() {
     fun showToolbarItem(){
         binding.toolbar.profileImage.visibility = View.VISIBLE
         binding.toolbar.userName.visibility = View.VISIBLE
-        //binding.toolbar.//back.visibility = View.VISIBLE
+        binding.toolbar.isActive.visibility = View.VISIBLE
+        binding.toolbar.back.visibility = View.VISIBLE
         //binding.toolbar.userName.textSize = 15f
     }
 
     fun hideToolbarItem(){
         binding.toolbar.profileImage.visibility = View.GONE
-       // binding.toolbar.back.visibility = View.GONE
+        binding.toolbar.back.visibility = View.GONE
         binding.toolbar.userName.setText(R.string.app_name)
+        binding.toolbar.isActive.visibility = View.GONE
+
         binding.toolbar.userName.textSize = 20f
     }
 

@@ -15,8 +15,8 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
-    val _userList = MutableLiveData<Response<ArrayList<User>>>()
-    val _userLiveData: MutableLiveData<Response<ArrayList<User>>>
+    val _userList = MutableLiveData<ArrayList<User>>()
+    val _userLiveData: MutableLiveData<ArrayList<User>>
         get() = _userList
 
     fun getUserFromFirebaseDb() = viewModelScope.launch{
@@ -32,7 +32,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
                             if (firebaseAuth.currentUser?.uid != userObj?.uid) {
                                 tempList.add(userObj!!)
                             }
-                            _userList.value = Response.Success(tempList)
+                            _userList.value = tempList
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
