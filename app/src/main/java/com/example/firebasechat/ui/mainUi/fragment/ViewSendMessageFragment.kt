@@ -58,7 +58,6 @@ class ViewSendMessageFragment : Fragment() {
         picUrl = arguments?.getString("pic").toString()
         isActive = arguments?.getBoolean("isActive") == true
 
-        setNameAndProfilePicOnToolBar()
 
         /*firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = Firebase.database.reference*/
@@ -67,15 +66,6 @@ class ViewSendMessageFragment : Fragment() {
         return binding.root
     }
 
-
-    private fun setNameAndProfilePicOnToolBar() {
-        (requireActivity() as MainActivity).binding.toolbar.userName.text = userName
-        val img = (requireActivity() as MainActivity).binding.toolbar.profileImage
-        Glide.with(requireContext()).load(picUrl).into(img)
-        if (isActive) (requireActivity() as MainActivity).binding.toolbar.isActive.text = "online" else (requireActivity() as MainActivity).binding.toolbar.isActive.text = "offline"
-
-
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         msgList = ArrayList()
@@ -114,55 +104,14 @@ class ViewSendMessageFragment : Fragment() {
 
         viewModel.addMessageToFirebaseDb(senderUid,receiverUid)
         viewModel._messageLiveData.observe(viewLifecycleOwner, Observer { it ->
-            when(it){
-                is Response.Success->{
-                    if (!it.data.isNullOrEmpty()){
-                        msgList.addAll(it.data)
-                        adapter = MessageAdapter(requireContext(),it.data)
-                        binding.recyclerViewMessage.adapter = adapter
-                        adapter.notifyItemInserted(msgList.size)
-                        binding.recyclerViewMessage.scrollToPosition(adapter.msgList.size - 1)
-                    }
-                }
-                is Response.Error->{
-
-                }
-                is Response.Loading->{
-
-                }
+            if (!it.isNullOrEmpty()){
+                msgList.addAll(it)
+                adapter = MessageAdapter(requireContext(),it)
+                binding.recyclerViewMessage.adapter = adapter
+                adapter.notifyItemInserted(msgList.size)
+                binding.recyclerViewMessage.scrollToPosition(adapter.msgList.size - 1)
             }
         })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        (requireActivity() as MainActivity).showToolbarItem()
-        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.GONE
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = false
-        (requireActivity() as MainActivity).binding
-
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.VISIBLE
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.VISIBLE
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.bottomNavigation.visibility = View.VISIBLE
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
     }
 
 

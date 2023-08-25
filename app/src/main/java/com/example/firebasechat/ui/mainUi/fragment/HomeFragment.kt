@@ -14,12 +14,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.startForegroundService
@@ -36,6 +38,7 @@ import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.StatusViewModel
 import com.example.firebasechat.mvvm.UserViewModel
+import com.example.firebasechat.ui.mainUi.ChatActivity
 import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
@@ -51,6 +54,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 
@@ -63,16 +71,16 @@ class HomeFragment : Fragment() {
     private val userViewModel by viewModels<UserViewModel>()
     private val statusViewModel by viewModels<StatusViewModel>()
 
-    var uid:String? = null
+    var uid: String? = null
     var profile: Uri? = null
     var status: Uri? = null
     var path = ""
     var user: User? = null
     var file: Uri? = null
     var profileImage: Boolean = false
-    var senderUid:String? = null
+    var senderUid: String? = null
     var receiverUid = ""
-    var senderRoom:String? = null
+    var senderRoom: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,6 +106,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.progressBarStatus.hide()
 
+        Handler().postDelayed({
+            val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+            firebaseDb.child("user").child(uid).child("active").setValue(true)
+        }, 60000)
 
 
         binding.statusImage.setOnClickListener { viewMyStatus() }
@@ -109,6 +121,7 @@ class HomeFragment : Fragment() {
         setUserToRecyclerView()
         setStatusRecyclerView()
 
+        //setStatusToOnline()
         senderUid = FirebaseAuth.getInstance().currentUser?.uid.toString()
 
         senderRoom = receiverUid + senderUid
@@ -120,10 +133,11 @@ class HomeFragment : Fragment() {
                     val value = snapshot.getValue(Message::class.java)
                     // Trigger the notification here.
                     val senderId = value!!.senderId
-                    if (!senderId!!.contains(FirebaseInstance.firebaseAuth.currentUser!!.uid)){
+                    if (!senderId!!.contains(FirebaseInstance.firebaseAuth.currentUser!!.uid)) {
                         MyFirebaseMessagingService().createDefaultBuilder(value.message!!)
                     }
                 }
+
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
                 override fun onChildRemoved(snapshot: DataSnapshot) {}
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -134,20 +148,44 @@ class HomeFragment : Fragment() {
 
     }
 
+    private fun setStatusToOnline() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+            var isActive: Boolean = false
+            firebaseDb.child("user").child(uid).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val snapshot = snapshot.getValue(User::class.java)
+                    isActive = snapshot!!.isActive
+
+                    if (isActive == false) {
+                        firebaseDb.child("user").child(uid).child("active").setValue(true)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(requireContext(), error.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
+        }
+
+
+    }
+
     private fun viewMyStatus() {
         findNavController().navigate(R.id.myStatusFragment)
     }
 
     private fun setStatusRecyclerView() {
         statusViewModel.getStatusFromFirebaseDb()
-        statusViewModel._statusLiveData.observe(viewLifecycleOwner){ it ->
-            if (!it.isNullOrEmpty()){
+        statusViewModel._statusLiveData.observe(viewLifecycleOwner) { it ->
+            if (!it.isNullOrEmpty()) {
                 var url = ""
                 statusList.addAll(it)
                 binding.progressBarStatus.hide()
                 it.forEach { url = it.statusUrl.toString() }
                 Glide.with(requireContext()).load(url).into(binding.statusImage)
-                statusAdapter = StatusAdapter(requireContext(),it,this)
+                statusAdapter = StatusAdapter(requireContext(), it, this)
                 binding.recyclerViewStatus.adapter = statusAdapter
                 statusAdapter.setData(it)
             }
@@ -157,17 +195,14 @@ class HomeFragment : Fragment() {
     private fun setUserToRecyclerView() {
         userViewModel.getUserFromFirebaseDb()
         userViewModel._userLiveData.observe(viewLifecycleOwner, Observer {
-            if (!it.isNullOrEmpty()){
+            if (!it.isNullOrEmpty()) {
                 binding.progressBar.visibility = View.GONE
                 binding.noChat.visibility = View.GONE
                 userList.addAll(it)
-                adapter = UserAdapter(requireContext(),it,this)
+                adapter = UserAdapter(requireContext(), it, this)
                 binding.recyclerViewUser.adapter = adapter
-                /*val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
-                if (uid != null){
-                    firebaseDb.child("user").child(uid).child("active").setValue(true)
-                }*/
-            }else{
+
+            } else {
                 binding.progressBar.visibility = View.GONE
                 binding.noChat.visibility = View.VISIBLE
             }
@@ -247,12 +282,14 @@ class HomeFragment : Fragment() {
 
         dialog.setCancelable(true)
     }
+
     private fun openVideo() {
         val videoIntent = Intent()
         videoIntent.type = "video/*"
         videoIntent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(videoIntent, GALLERY_REQ_CODE)
     }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun openGallery() {
         val galleryIntent = Intent(Intent.ACTION_PICK)
@@ -261,6 +298,7 @@ class HomeFragment : Fragment() {
         startActivityForResult(galleryIntent, GALLERY_REQ_CODE)
 
     }
+
     private fun openCamera() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(cameraIntent, CAMERA_REQ_CODE)
@@ -306,34 +344,13 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        requireActivity().startService(Intent(requireContext(),FcmService::class.java))
-        (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.title = null
-    }
-
-    override fun onPause() {
-        super.onPause()
-        (requireActivity() as MainActivity).hideToolbarItem()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        /*val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
         val lastSeen = Utils.dateTime(Calendar.getInstance())
         firebaseDb.child("user").child(uid).child("active").setValue(false)
         firebaseDb.child("user").child(uid).child("lastSeen").setValue(lastSeen)
-*/
-        (requireActivity() as MainActivity).hideToolbarItem()
-        (requireActivity() as MainActivity).binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
+
     }
 
     fun getUid(uid: String?) {

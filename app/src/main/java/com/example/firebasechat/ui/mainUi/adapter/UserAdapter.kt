@@ -1,6 +1,7 @@
 package com.example.firebasechat.ui.mainUi.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.model.User
+import com.example.firebasechat.ui.mainUi.ChatActivity
 import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
 import de.hdodenhof.circleimageview.CircleImageView
 
 class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:HomeFragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
+
+    var setOnClickListener: ((User)-> Unit)? = null
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val user:TextView = itemView.findViewById(R.id.userName)
@@ -32,14 +36,22 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
         val item = usrArrList[position]
         holder.user.text = item.name
         holder.itemView.setOnClickListener {
-            val bundle = Bundle().apply {
+            /*val bundle = Bundle().apply {
                 putString("userName", item.name)
                 putString("uid",item.uid)
                 putString("pic",item.pic)
                 putBoolean("isActive", item.isActive)
-            }
-            holder.user.findNavController().navigate(R.id.viewSendMessageFragment,bundle)
+            }*/
+            //holder.user.findNavController().navigate(R.id.viewSendMessageFragment,bundle)
+            val intent = Intent(context,ChatActivity::class.java)
+            intent.putExtra("userName", item.name)
+            intent.putExtra("uid", item.uid)
+            intent.putExtra("pic", item.pic)
+            intent.putExtra("isActive", item.isActive)
+            intent.putExtra("lastSeen", item.lastSeen)
+            context.startActivity(intent)
         }
+
         if (holder.profileImage != null){
             Glide.with(context).load(item.pic).into(holder.profileImage)
         }

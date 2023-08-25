@@ -28,7 +28,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    lateinit var progressBar: ProgressBar
     lateinit var prefManager: PrefManager
     lateinit var appBarConfiguration: AppBarConfiguration
     lateinit var bottomNavigationView: BottomNavigationView
@@ -40,33 +39,53 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar.toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "ChitChat"
 
-        bottomNavigationView = findViewById(R.id.bottomNavigation)
+        setNavHostFragment()
 
-        //Set NavHostFragment
-        navController = findNavController(R.id.mainNavHostFragment)
+        statusBarBackground()
 
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment,R.id.viewStatusFragment))
-        bottomNavigationView.setupWithNavController(navController)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        //Status BAr Background
-        window.apply { decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR }
-        window.statusBarColor = ContextCompat.getColor(this, R.color.primary)
-
-
-        progressBar = findViewById(R.id.progressBar)
         prefManager = PrefManager(this)
 
-        progressBar.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+
+        setClickOnDotMenu()
+
+        setClickOnBottomMenu()
 
 
-        //Set on click on menu time
-        binding.toolbar.toolbar.setOnMenuItemClickListener {
+    }
+
+    private fun setClickOnBottomMenu() {
+        //Bottom NavigationView
+        binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId){
-                R.id.newMsg->{
+                R.id.homeFragment->{
+                    if (!it.isChecked){
+                        navController.navigate(R.id.homeFragment)
+                    }
+
+                    vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                    vibrator.vibrate(20)
+                }
+                R.id.viewStatusFragment->{
+                    if (!it.isChecked){
+                        navController.navigate(R.id.viewStatusFragment)
+                    }
+                    vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                    vibrator.vibrate(20)
+                }
+            }
+            return@setOnItemSelectedListener true
+        }
+    }
+
+    private fun setClickOnDotMenu() {
+        //Set on click on menu time
+        binding.toolbar.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.contact->{
                     navController.navigate(R.id.newMessageFragment)
                 }
                 R.id.profile->{
@@ -76,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     navController.navigate(R.id.profileFragment,bundle)
                 }
-                R.id.signout->{
+                R.id.account->{
                     firebaseAuth.signOut()
                     val intent = Intent(this, AuthMobileActivity::class.java)
                     startActivity(intent)
@@ -85,28 +104,22 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+    }
 
-        //Bottom NavigationView
-       binding.bottomNavigation.setOnItemSelectedListener {
-           when(it.itemId){
-               R.id.homeFragment->{
-                   if (!it.isChecked){
-                       navController.navigate(R.id.homeFragment)
-                   }
+    private fun statusBarBackground() {
+        //Status BAr Background
+        window.apply { decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR }
+        window.statusBarColor = ContextCompat.getColor(this, R.color.primary)
+    }
 
-                   vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
-                   vibrator.vibrate(20)
-               }
-               R.id.viewStatusFragment->{
-                   if (!it.isChecked){
-                       navController.navigate(R.id.viewStatusFragment)
-                   }
-                   vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
-                   vibrator.vibrate(20)
-               }
-           }
-           return@setOnItemSelectedListener true
-       }
+    private fun setNavHostFragment() {
+        bottomNavigationView = findViewById(R.id.bottomNavigation)
+        //Set NavHostFragment
+        navController = findNavController(R.id.mainNavHostFragment)
+
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment,R.id.viewStatusFragment))
+        bottomNavigationView.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -131,29 +144,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    fun showToolbarItem(){
-        binding.toolbar.profileImage.visibility = View.VISIBLE
-        binding.toolbar.userName.visibility = View.VISIBLE
-        binding.toolbar.isActive.visibility = View.VISIBLE
-        binding.toolbar.back.visibility = View.VISIBLE
-        //binding.toolbar.userName.textSize = 15f
-    }
-
-    fun hideToolbarItem(){
-        binding.toolbar.profileImage.visibility = View.GONE
-        binding.toolbar.back.visibility = View.GONE
-        binding.toolbar.userName.setText(R.string.app_name)
-        binding.toolbar.isActive.visibility = View.GONE
-
-        binding.toolbar.userName.textSize = 20f
-    }
-
     override fun onStart() {
         super.onStart()
-        hideToolbarItem()
-        binding.toolbar.toolbar.menu.findItem(R.id.account).isVisible = true
-
         val current = firebaseAuth.currentUser?.uid
         if (current.isNullOrEmpty()){
             val intent = Intent(this, AuthMobileActivity::class.java)
@@ -167,12 +159,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        hideToolbarItem()
     }
 
     override fun onResume() {
         super.onResume()
-        hideToolbarItem()
     }
 
 

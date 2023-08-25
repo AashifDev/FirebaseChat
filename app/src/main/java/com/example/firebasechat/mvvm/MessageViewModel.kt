@@ -22,8 +22,8 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
     var CHANNEL_ID: String? = "channel1"
     var name: String? = "channel1"
 
-    val _messageList = MutableLiveData<Response<ArrayList<Message>>>()
-    val _messageLiveData: MutableLiveData<Response<ArrayList<Message>>>
+    val _messageList = MutableLiveData<ArrayList<Message>>()
+    val _messageLiveData: MutableLiveData<ArrayList<Message>>
         get() = _messageList
 
     fun addMessageToFirebaseDb(senderUid: String, receiverUid: String) = viewModelScope.launch {
@@ -41,7 +41,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                             val message = postSnapshot.getValue(Message::class.java)
                             tempList.add(message!!)
                         }
-                        _messageList.value = Response.Success(tempList)
+                        _messageList.value = tempList
 
                     } catch (e: Exception) {
                         e.printStackTrace()

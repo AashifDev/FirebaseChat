@@ -1,5 +1,7 @@
 package com.example.firebasechat.ui.authWithEmail.fragment
 
+import android.Manifest
+import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -31,18 +33,15 @@ import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.FirebaseInstance.firebaseStorage
+import com.example.firebasechat.utils.ManagePermissions
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.storage.StorageReference
-import java.time.LocalDate
 import java.util.Calendar
-import java.util.Date
 
 class RegisterFragment : Fragment() {
 
     lateinit var binding: FragmentRegisterBinding
-    /*lateinit var firebaseAuth: FirebaseAuth
-    lateinit var firebaseDb: DatabaseReference
-    lateinit var firebaseStorage: FirebaseStorage*/
+    private lateinit var managePermissions: ManagePermissions
 
     val CAMERA_REQ_CODE = 101
     val GALLERY_REQ_CODE = 102
@@ -72,6 +71,17 @@ class RegisterFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        var list = listOf<String>(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+
+        //Initialize a new instance of ManagePermissions class
+        managePermissions = ManagePermissions(requireActivity(),list,101)
+
+
+
 
         binding.profile.setOnClickListener {
             uploadImageDialog()
@@ -125,7 +135,7 @@ class RegisterFragment : Fragment() {
                             uid = uid,
                             mobileNumber = mobileNumber,
                             pic = path,
-                            isActive = true,
+                            isActive = false,
                             lastSeen = calender,
                             joinDate = calender
                         )
@@ -262,4 +272,5 @@ class RegisterFragment : Fragment() {
             }
         }
     }
+
 }
