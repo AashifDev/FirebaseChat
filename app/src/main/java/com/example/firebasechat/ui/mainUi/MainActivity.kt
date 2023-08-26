@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -20,17 +21,17 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
+import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var prefManager: PrefManager
-    lateinit var appBarConfiguration: AppBarConfiguration
-    lateinit var bottomNavigationView: BottomNavigationView
     lateinit var navController: NavController
     private lateinit var vibrator: Vibrator
 
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         setClickOnDotMenu()
 
-        setClickOnBottomMenu()
+        //setClickOnBottomMenu()
 
 
     }
@@ -86,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.contact->{
-                    navController.navigate(R.id.newMessageFragment)
+                    navController.navigate(R.id.action_homeFragment_to_newMessageFragment)
                 }
                 R.id.profile->{
                     val currentId = firebaseAuth.currentUser?.uid
@@ -96,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.profileFragment,bundle)
                 }
                 R.id.account->{
-                    firebaseAuth.signOut()
+                    //firebaseAuth.signOut()
                     val intent = Intent(this, AuthMobileActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -113,18 +114,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setNavHostFragment() {
-        bottomNavigationView = findViewById(R.id.bottomNavigation)
         //Set NavHostFragment
-        navController = findNavController(R.id.mainNavHostFragment)
-
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment,R.id.viewStatusFragment))
-        bottomNavigationView.setupWithNavController(navController)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainNavHostFragment) as NavHostFragment
+        navController = navHostFragment.navController
+        binding.bottomNavigation.setupWithNavController(navController)
+        binding.toolbar.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.mainNavHostFragment)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -157,12 +155,12 @@ class MainActivity : AppCompatActivity() {
         Log.d("tag", current.toString())
     }
 
-    override fun onRestart() {
-        super.onRestart()
-    }
-
-    override fun onResume() {
-        super.onResume()
+    override fun onDestroy() {
+        super.onDestroy()
+        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+        val lastSeen = Utils.dateTime(Calendar.getInstance())
+        firebaseDb.child("user").child(uid).child("active").setValue(false)
+        firebaseDb.child("user").child(uid).child("lastSeen").setValue(lastSeen)
     }
 
 

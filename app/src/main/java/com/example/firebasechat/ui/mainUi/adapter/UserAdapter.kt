@@ -7,16 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.navigation.findNavController
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.model.User
 import com.example.firebasechat.ui.mainUi.ChatActivity
 import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
+import com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment
 import de.hdodenhof.circleimageview.CircleImageView
+import java.io.Serializable
 
-class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:HomeFragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
+
+class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:Fragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
 
     var setOnClickListener: ((User)-> Unit)? = null
 
@@ -65,8 +68,11 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
             holder.isActive.visibility = View.GONE
         }
 
-        listener.getUid(item.uid)
+        when(listener){
+            is HomeFragment->{
+                listener.getUid(item.uid)
+            }
+        }
 
     }
-
 }

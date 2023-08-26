@@ -1,24 +1,11 @@
 package com.example.firebasechat.utils
 
-import android.app.Dialog
 import android.content.Context
-import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.Build
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.view.Gravity
-import android.view.WindowManager
-import android.widget.ImageView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.example.firebasechat.R
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -131,7 +118,7 @@ object Utils {
         return changedDate
     }*/
 
-    /*fun changeTimeFormat(time: String?): String?{
+    fun changeTimeFormat(time: String?): String?{
         var changedTime = ""
         try {
             val display = SimpleDateFormat("hh:mm a", Locale.US)
@@ -142,15 +129,36 @@ object Utils {
             e.printStackTrace()
         }
         return changedTime
-    }*/
+    }
 
+    //Display Current date and time like "2023-08-25 11:06:54 PM"
     fun dateTime(calendar: Calendar): String {
         val dtForm: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a",Locale.US)
         val date: String = dtForm.format(calendar.time)
         return date
     }
 
+    //Display time (11:06:54 PM)  from Calender date  like "2023-08-25 11:06:54 PM"
+    fun getTimeFromCalender(date: String?):String{
+        val inputDateString = date
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a", Locale.US)
+        val date = inputFormat.parse(inputDateString)
+        val outputFormat = SimpleDateFormat("hh:mm a", Locale.US)
+        val outputTimeString = outputFormat.format(date)
+        println(outputTimeString)
+        return outputTimeString
+    }
 
+    //Display date "2023-08-25 11:06:54 PM" to "2023-08-25
+    fun getDateFromCalender(date: String?):String{
+        val inputDateString = date
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a", Locale.US)
+        val date = inputFormat.parse(inputDateString)
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val outputDateString = outputFormat.format(date)
+        println(outputDateString)
+        return outputDateString
+    }
     fun getImageUriFromBitmap(context: Context?, bitmap: Bitmap?):Uri{
         val bytes = ByteArrayOutputStream()
         bitmap?.compress(Bitmap.CompressFormat.JPEG,100, bytes)

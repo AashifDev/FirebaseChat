@@ -1,6 +1,7 @@
 package com.example.firebasechat.utils
 
 import android.app.Application
+import androidx.core.provider.FontRequest
 import com.google.firebase.database.FirebaseDatabase
 
 class App:Application() {

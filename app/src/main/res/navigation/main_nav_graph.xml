@@ -8,7 +8,14 @@
         android:id="@+id/homeFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="@null"/>
+        android:label="@null">
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_newMessageFragment"
+            app:destination="@id/newMessageFragment" />
+    </fragment>
     <fragment
         android:id="@+id/viewSendMessageFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ViewSendMessageFragment"
@@ -18,12 +25,12 @@
         android:id="@+id/newMessageFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment"
         tools:layout="@layout/fragment_new_message"
-        android:label="@null"/>
+        android:label="Select Contact"/>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ProfileFragment"
         tools:layout="@layout/fragment_profile"
-        android:label="@null"/>
+        android:label="Profile"/>
     <fragment
         android:id="@+id/viewStatusFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.ViewStatusFragment"

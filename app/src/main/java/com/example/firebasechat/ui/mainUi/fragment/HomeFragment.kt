@@ -59,7 +59,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 
 
 class HomeFragment : Fragment() {
@@ -109,7 +114,7 @@ class HomeFragment : Fragment() {
         Handler().postDelayed({
             val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
             firebaseDb.child("user").child(uid).child("active").setValue(true)
-        }, 60000)
+        }, 15000)
 
 
         binding.statusImage.setOnClickListener { viewMyStatus() }
@@ -344,18 +349,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
-        val lastSeen = Utils.dateTime(Calendar.getInstance())
-        firebaseDb.child("user").child(uid).child("active").setValue(false)
-        firebaseDb.child("user").child(uid).child("lastSeen").setValue(lastSeen)
-
-    }
-
     fun getUid(uid: String?) {
         receiverUid = uid!!
     }
-
-
 }
