@@ -1,15 +1,24 @@
 package com.example.firebasechat.ui.mainUi
 
+import android.Manifest
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityChatBinding
@@ -17,13 +26,22 @@ import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.MessageViewModel
 import com.example.firebasechat.ui.mainUi.adapter.MessageAdapter
+import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.RtcEngineConfig
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -32,11 +50,20 @@ class ChatActivity : AppCompatActivity() {
     lateinit var adapter: MessageAdapter
     lateinit var msgList: ArrayList<Message>
 
-    var senderRoom:String? = null
-    var receiverRoom:String? = null
+    var senderRoom: String? = null
+    var receiverRoom: String? = null
 
     private val viewModel by viewModels<MessageViewModel>()
 
+    private val uid = "0"
+    private var isJoined = false
+    // Agora engine instance
+    private var agoraEngine: RtcEngine? = null
+    private var mRtcEventHandler: IRtcEngineEventHandler? = null
+
+    var PERMISSION_REQ_ID_RECORD_AUDIO = 101
+
+    var navController: NavController? = null
     var userName = ""
     var picUrl = ""
     var lastSeen = ""
@@ -45,10 +72,12 @@ class ChatActivity : AppCompatActivity() {
     var message = ""
     var senderUid = ""
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         statusBarBackground()
 
@@ -66,16 +95,120 @@ class ChatActivity : AppCompatActivity() {
 
         setDataToRecyclerView()
 
+        setClickOnDotMenu()
+
         changeImageToMicAndSendIcon()
+
+        setChatBackground()
+
+        setClickOnToolbarItem()
+
+        initAgora()
+
+        mRtcEventHandler = object : IRtcEngineEventHandler() {
+            override fun onUserJoined(uid: Int, elapsed: Int) {
+                //runOnUiThread { binding.remoteUserStatus.text = "Remote user joined: $uid" }
+            }
+
+            override fun onJoinChannelSuccess(channel: String, uid: Int, elapsed: Int) {
+                // Successfully joined a channel
+                isJoined = true
+              //  showMessage("Joined Channel $channel")
+              //  runOnUiThread { binding.remoteUserStatus.text = "Waiting for a remote user to join" }
+            }
+
+            override fun onUserOffline(uid: Int, reason: Int) {
+                // Listen for remote users leaving the channel
+               // showMessage("Remote user offline $uid $reason")
+                if (isJoined) runOnUiThread {
+             //       binding.remoteUserStatus.text = "Waiting for a remote user to join"
+                }
+            }
+
+            override fun onLeaveChannel(stats: RtcStats) {
+                // Listen for the local user leaving the channel
+              //  runOnUiThread { binding.remoteUserStatus.text = "Press the button to join a channel" }
+                isJoined = false
+            }
+        }
+    }
+
+    private fun initAgora() {
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO)){
+            setupAgoraSDKEngine()
+        }
+    }
+
+    private fun setupAgoraSDKEngine() {
+        initializeAgoraEngine()
+        //joinChannel()
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun initializeAgoraEngine() {
+        GlobalScope.launch (Dispatchers.Main){
+            val config = RtcEngineConfig()
+            config.mContext = applicationContext
+            config.mAppId = getString(R.string.app_id)
+            config.mEventHandler = mRtcEventHandler
+            agoraEngine = RtcEngine.create(config)
+        }
+    }
+
+    private fun joinChannel() {
+        val options = ChannelMediaOptions()
+
+        options.autoSubscribeAudio = true
+        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+        options.channelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
+        agoraEngine?.setEnableSpeakerphone(true)
+        agoraEngine?.setDefaultAudioRoutetoSpeakerphone(true)
+        agoraEngine?.joinChannel(null, "Testing", 0, options)
+
+        Toast.makeText(this@ChatActivity, "Connected.", Toast.LENGTH_SHORT).show()
+
+    }
+
+    private fun setClickOnToolbarItem() {
+        val agoraConfig = User.Agora(
+            null,
+            "Testing",
+            uid=uid
+            )
+        binding.toolbar.audioCall.setOnClickListener {
+           /* FirebaseInstance.firebaseDb
+                .child("user")
+                .child(receiverUid)
+                .child("agora")
+                .setValue(agoraConfig)*/
+            Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setChatBackground() {
+        FirebaseInstance.firebaseDb.child("user").child(receiverUid)
+            .addValueEventListener(object :ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val data = snapshot.getValue(User::class.java)
+                    val img = data!!.chatBackground
+                    Glide.with(this@ChatActivity).load(img).into(binding.chatBackground)
+                    println("ChatActivity.onDataChange::${img.toString()}")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("error",error.message)
+                }
+
+            })
     }
 
     private fun changeImageToMicAndSendIcon() {
-        binding.editTextWriteMessage.addTextChangedListener(object :TextWatcher{
+        binding.editTextWriteMessage.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {
                 val size = p0!!.length
-                if (size>0) {
+                if (size > 0) {
                     binding.send.setImageResource(R.drawable.send1)
                 } else {
                     binding.send.setImageResource(R.drawable.ic_mic)
@@ -86,7 +219,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun showTypingPlaceHolder() {
         binding.editTextWriteMessage.setOnFocusChangeListener { view, b ->
-            if (view.hasFocus()){
+            if (view.hasFocus()) {
                 FirebaseInstance.firebaseDb
                     .child("user")
                     .child(FirebaseAuth.getInstance().currentUser!!.uid)
@@ -95,17 +228,17 @@ class ChatActivity : AppCompatActivity() {
         }
 
         FirebaseInstance.firebaseDb.child("user").child(receiverUid)
-            .addValueEventListener(object :ValueEventListener{
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val data = snapshot.getValue(User::class.java)
                     val isTyping = data?.isTyping!!
-                    if (isTyping == true){
+                    if (isTyping == true) {
                         binding.toolbar.isActive.text = "typing.."
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.d("err",error.message)
+                    Log.d("err", error.message)
                 }
 
             })
@@ -120,7 +253,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun sendMessage() {
         binding.send.setOnClickListener {
-            if (validMessage()){
+            if (validMessage()) {
                 viewModel.sendMessage(message, senderUid)
                 binding.editTextWriteMessage.text?.clear()
                 FirebaseInstance.firebaseDb
@@ -132,6 +265,87 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    private fun setClickOnDotMenu() {
+        //Set on click on menu time
+        binding.toolbar.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.block -> {
+                    //navController.navigate(R.id.action_homeFragment_to_newMessageFragment)
+                }
+
+                R.id.profile -> {
+                    val currentId = FirebaseInstance.firebaseAuth.currentUser?.uid
+                    navController.let {
+                        navController?.navigate(R.id.profileFragment)
+                    }
+                    val bundle = Bundle().apply {
+                        putString("navConroller", currentId)
+                    }
+
+                    //navController.navigate(R.id.profileFragment,bundle)
+                }
+
+                R.id.changeBg -> {
+                    changeBackground()
+                }
+            }
+            return@setOnMenuItemClickListener true
+        }
+    }
+
+    private fun changeBackground() {
+
+        if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES, GALLERY_REQ_CODE)){
+            openGallery()
+        }
+    }
+
+    private fun checkSelfPermission(permission: String, requestCode: Int): Boolean {
+        if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, Array(1) { permission }, requestCode)
+            ActivityCompat.requestPermissions(this, Array(1) { permission }, PERMISSION_REQ_ID_RECORD_AUDIO)
+            return false
+        }
+        return true
+    }
+
+    private fun openGallery() {
+        val galleryIntent = Intent()
+        galleryIntent.type = "image/**"
+        galleryIntent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(galleryIntent, GALLERY_REQ_CODE)
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            GALLERY_REQ_CODE -> {
+                try {
+                    //val bitmap = MediaStore.Images.Media.getBitmap(context?.contentResolver, profile)
+                    val backgroundImage = data!!.data
+                    setThisBackgroundImageToFirebaseStrorage(backgroundImage)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun setThisBackgroundImageToFirebaseStrorage(backgroundImage: Uri?) {
+        binding.chatBackground.setImageURI(backgroundImage)
+        if (backgroundImage != null){
+            val ref = FirebaseInstance.firebaseStorage.child("chatBackground/"+ FirebaseInstance.firebaseAuth.currentUser?.email)
+                ref.putFile(backgroundImage)
+                .addOnSuccessListener {
+                    ref.downloadUrl.addOnSuccessListener {
+                        FirebaseInstance.firebaseDb.child("user").child(receiverUid)
+                            .child("chatBackground").setValue(it.toString())
+                    }
+                }
+        }
+    }
+
     private fun senderAndReceiverRoom() {
         senderRoom = receiverUid + senderUid
         receiverRoom = senderUid + receiverUid
@@ -139,7 +353,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun initArrListAndAdapter() {
         msgList = ArrayList()
-        adapter = MessageAdapter(this,msgList)
+        adapter = MessageAdapter(this, msgList)
     }
 
     private fun getDataFromIntent() {
@@ -186,18 +400,18 @@ class ChatActivity : AppCompatActivity() {
 
     private fun validMessage(): Boolean {
         message = binding.editTextWriteMessage.text.toString()
-        if (message.isEmpty() && message==""){
+        if (message.isEmpty() && message == "") {
             return false
         }
         return true
     }
 
     private fun setDataToRecyclerView() {
-        viewModel.addMessageToFirebaseDb(senderUid,receiverUid)
+        viewModel.addMessageToFirebaseDb(senderUid, receiverUid)
         viewModel._messageLiveData.observe(this, Observer { it ->
-            if (!it.isNullOrEmpty()){
+            if (!it.isNullOrEmpty()) {
                 msgList.addAll(it)
-                adapter = MessageAdapter(this,it)
+                adapter = MessageAdapter(this, it)
                 binding.recyclerViewMessage.adapter = adapter
                 adapter.notifyItemInserted(msgList.size)
                 binding.recyclerViewMessage.scrollToPosition(adapter.msgList.size - 1)

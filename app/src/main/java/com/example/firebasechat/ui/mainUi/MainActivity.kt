@@ -40,8 +40,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "ChitChat"
+
+        //If you using setSupportActionBar then u have to manually inflate menu option
+        setSupportActionBar(binding.toolbar.toolbar)
+        //supportActionBar?.title = "ChitChat"
 
         setNavHostFragment()
 
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         setClickOnDotMenu()
 
-        //setClickOnBottomMenu()
+        setClickOnBottomMenu()
 
 
     }
@@ -66,7 +68,6 @@ class MainActivity : AppCompatActivity() {
                     if (!it.isChecked){
                         navController.navigate(R.id.homeFragment)
                     }
-
                     vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
                     vibrator.vibrate(20)
                 }
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setClickOnDotMenu() {
         //Set on click on menu time
-        binding.toolbar.setOnMenuItemClickListener {
+        binding.toolbar.toolbar.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.contact->{
                     navController.navigate(R.id.action_homeFragment_to_newMessageFragment)
@@ -117,8 +118,9 @@ class MainActivity : AppCompatActivity() {
         //Set NavHostFragment
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainNavHostFragment) as NavHostFragment
         navController = navHostFragment.navController
+        //setupActionBarWithNavController(navController)
         binding.bottomNavigation.setupWithNavController(navController)
-        binding.toolbar.setupWithNavController(navController)
+        binding.toolbar.toolbar.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {

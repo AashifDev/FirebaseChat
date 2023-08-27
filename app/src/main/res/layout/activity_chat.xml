@@ -8,11 +8,23 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar"
+        layout="@layout/chat_activity_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/chatBackground"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.5" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMessage"
@@ -38,15 +50,15 @@
         android:id="@+id/editTextWriteMessage"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginEnd="6dp"
         android:background="@drawable/bg_edit_text"
         android:hint="Type message..."
         android:maxLines="1"
-        android:textSize="14sp"
         android:nestedScrollingEnabled="true"
         android:paddingStart="10dp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/send"
         app:layout_constraintEnd_toStartOf="@id/send"
-        android:layout_marginEnd="6dp"
         app:layout_constraintStart_toStartOf="@+id/recyclerViewMessage"
         app:layout_constraintTop_toTopOf="@id/send" />
 
@@ -55,12 +67,13 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_gravity="center"
+        android:layout_margin="10dp"
         android:background="@drawable/send_background"
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_mic"
-        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/recyclerViewMessage" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

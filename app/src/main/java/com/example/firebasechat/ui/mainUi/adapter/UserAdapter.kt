@@ -7,12 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.model.User
 import com.example.firebasechat.ui.mainUi.ChatActivity
+import com.example.firebasechat.ui.mainUi.MainActivity
 import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
 import com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment
 import de.hdodenhof.circleimageview.CircleImageView
@@ -21,6 +24,7 @@ import java.io.Serializable
 
 class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:Fragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
 
+    val activity: MainActivity? = null
     var setOnClickListener: ((User)-> Unit)? = null
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
@@ -44,14 +48,16 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
                 putString("uid",item.uid)
                 putString("pic",item.pic)
                 putBoolean("isActive", item.isActive)
-            }*/
-            //holder.user.findNavController().navigate(R.id.viewSendMessageFragment,bundle)
-            val intent = Intent(context,ChatActivity::class.java)
-            intent.putExtra("userName", item.name)
-            intent.putExtra("uid", item.uid)
-            intent.putExtra("pic", item.pic)
-            intent.putExtra("isActive", item.isActive)
-            intent.putExtra("lastSeen", item.lastSeen)
+                putString("lastSeen", item.lastSeen)
+            }
+            holder.user.findNavController().navigate(R.id.chat_nav_graph,bundle)*/
+            val intent = Intent(context,ChatActivity::class.java).apply {
+                putExtra("userName", item.name)
+                putExtra("pic", item.pic)
+                putExtra("uid",item.uid)
+                putExtra("isActive", item.isActive)
+                putExtra("lastSeen", item.lastSeen)
+            }
             context.startActivity(intent)
         }
 
@@ -66,12 +72,6 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
             holder.isActive.visibility = View.VISIBLE
         }else{
             holder.isActive.visibility = View.GONE
-        }
-
-        when(listener){
-            is HomeFragment->{
-                listener.getUid(item.uid)
-            }
         }
 
     }

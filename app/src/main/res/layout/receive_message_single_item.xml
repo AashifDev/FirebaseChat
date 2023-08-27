@@ -14,7 +14,7 @@
         android:layout_marginBottom="6dp"
         android:background="@drawable/receive_msg_background"
         android:gravity="start"
-        android:padding="16dp"
+        android:padding="6dp"
         android:text="The sent message will appear here."
         android:textColor="@color/white"
         android:textSize="14sp"
