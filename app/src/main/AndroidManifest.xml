@@ -4,31 +4,23 @@
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
-
-    <!-- Required only if your app targets Android 13. -->
+        android:required="false" /> <!-- Required only if your app targets Android 13. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-
-    <!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices.-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices. -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
@@ -43,7 +35,13 @@
         android:theme="@style/Theme.FirebaseChat"
         tools:targetApi="31">
         <activity
-            android:name=".ui.mainUi.ChatActivity"
+            android:name=".ui.activity.VideoCallActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.CallActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.ChatActivity"
             android:exported="false" />
         <activity
             android:name=".ui.authWithMobile.AuthMobileActivity"
@@ -66,7 +64,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.mainUi.MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="false"
             android:screenOrientation="locked" />
         <!--

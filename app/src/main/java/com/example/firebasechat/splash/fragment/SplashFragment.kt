@@ -12,8 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.session.PrefManager
-import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
-import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.ui.activity.MainActivity
 import com.example.firebasechat.utils.App
 
 class SplashFragment : Fragment() {

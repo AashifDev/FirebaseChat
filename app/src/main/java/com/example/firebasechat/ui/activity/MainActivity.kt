@@ -1,4 +1,4 @@
-package com.example.firebasechat.ui.mainUi
+package com.example.firebasechat.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,15 +7,10 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.Menu
 import android.view.View
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
@@ -25,7 +20,6 @@ import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.Calendar
 
 

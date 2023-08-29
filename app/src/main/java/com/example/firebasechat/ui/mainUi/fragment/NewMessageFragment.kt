@@ -7,16 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
-import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentNewMessageBinding
-import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.UserViewModel
-import com.example.firebasechat.ui.mainUi.MainActivity
-import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
-import com.example.firebasechat.utils.hide
 
 
 class NewMessageFragment : Fragment() {

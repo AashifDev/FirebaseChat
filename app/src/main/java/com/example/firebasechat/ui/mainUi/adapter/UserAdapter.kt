@@ -2,24 +2,18 @@ package com.example.firebasechat.ui.mainUi.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.model.User
-import com.example.firebasechat.ui.mainUi.ChatActivity
-import com.example.firebasechat.ui.mainUi.MainActivity
-import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
-import com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment
+import com.example.firebasechat.ui.activity.ChatActivity
+import com.example.firebasechat.ui.activity.MainActivity
 import de.hdodenhof.circleimageview.CircleImageView
-import java.io.Serializable
 
 
 class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:Fragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
@@ -51,7 +45,7 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
                 putString("lastSeen", item.lastSeen)
             }
             holder.user.findNavController().navigate(R.id.chat_nav_graph,bundle)*/
-            val intent = Intent(context,ChatActivity::class.java).apply {
+            val intent = Intent(context, ChatActivity::class.java).apply {
                 putExtra("userName", item.name)
                 putExtra("pic", item.pic)
                 putExtra("uid",item.uid)

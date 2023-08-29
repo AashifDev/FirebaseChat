@@ -1,7 +1,6 @@
 package com.example.firebasechat.ui.authWithEmail.fragment
 
 import android.Manifest
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,7 +27,7 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentRegisterBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
-import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.ui.activity.MainActivity
 import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb

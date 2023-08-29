@@ -24,7 +24,7 @@ import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentAddProfileBinding
 import com.example.firebasechat.model.User
 import com.example.firebasechat.session.PrefManager
-import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.ui.activity.MainActivity
 import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
@@ -33,7 +33,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import java.io.ByteArrayOutputStream
 
 
 class AddProfileFragment : Fragment() {

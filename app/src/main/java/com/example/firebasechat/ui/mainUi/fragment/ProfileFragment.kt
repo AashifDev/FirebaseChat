@@ -5,10 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentProfileBinding
 import com.example.firebasechat.model.User
-import com.example.firebasechat.ui.mainUi.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database

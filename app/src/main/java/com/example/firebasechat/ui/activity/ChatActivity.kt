@@ -1,10 +1,10 @@
-package com.example.firebasechat.ui.mainUi
+package com.example.firebasechat.ui.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,11 +12,10 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
@@ -54,15 +53,8 @@ class ChatActivity : AppCompatActivity() {
     var receiverRoom: String? = null
 
     private val viewModel by viewModels<MessageViewModel>()
-
-    private val uid = "0"
-    private var isJoined = false
-    // Agora engine instance
-    private var agoraEngine: RtcEngine? = null
-    private var mRtcEventHandler: IRtcEngineEventHandler? = null
-
     var PERMISSION_REQ_ID_RECORD_AUDIO = 101
-
+    private val uid = "0"
     var navController: NavController? = null
     var userName = ""
     var picUrl = ""
@@ -72,12 +64,10 @@ class ChatActivity : AppCompatActivity() {
     var message = ""
     var senderUid = ""
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         statusBarBackground()
 
@@ -102,78 +92,13 @@ class ChatActivity : AppCompatActivity() {
         setChatBackground()
 
         setClickOnToolbarItem()
-
-        initAgora()
-
-        mRtcEventHandler = object : IRtcEngineEventHandler() {
-            override fun onUserJoined(uid: Int, elapsed: Int) {
-                //runOnUiThread { binding.remoteUserStatus.text = "Remote user joined: $uid" }
-            }
-
-            override fun onJoinChannelSuccess(channel: String, uid: Int, elapsed: Int) {
-                // Successfully joined a channel
-                isJoined = true
-              //  showMessage("Joined Channel $channel")
-              //  runOnUiThread { binding.remoteUserStatus.text = "Waiting for a remote user to join" }
-            }
-
-            override fun onUserOffline(uid: Int, reason: Int) {
-                // Listen for remote users leaving the channel
-               // showMessage("Remote user offline $uid $reason")
-                if (isJoined) runOnUiThread {
-             //       binding.remoteUserStatus.text = "Waiting for a remote user to join"
-                }
-            }
-
-            override fun onLeaveChannel(stats: RtcStats) {
-                // Listen for the local user leaving the channel
-              //  runOnUiThread { binding.remoteUserStatus.text = "Press the button to join a channel" }
-                isJoined = false
-            }
-        }
-    }
-
-    private fun initAgora() {
-        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO)){
-            setupAgoraSDKEngine()
-        }
-    }
-
-    private fun setupAgoraSDKEngine() {
-        initializeAgoraEngine()
-        //joinChannel()
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun initializeAgoraEngine() {
-        GlobalScope.launch (Dispatchers.Main){
-            val config = RtcEngineConfig()
-            config.mContext = applicationContext
-            config.mAppId = getString(R.string.app_id)
-            config.mEventHandler = mRtcEventHandler
-            agoraEngine = RtcEngine.create(config)
-        }
-    }
-
-    private fun joinChannel() {
-        val options = ChannelMediaOptions()
-
-        options.autoSubscribeAudio = true
-        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-        options.channelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
-        agoraEngine?.setEnableSpeakerphone(true)
-        agoraEngine?.setDefaultAudioRoutetoSpeakerphone(true)
-        agoraEngine?.joinChannel(null, "Testing", 0, options)
-
-        Toast.makeText(this@ChatActivity, "Connected.", Toast.LENGTH_SHORT).show()
-
     }
 
     private fun setClickOnToolbarItem() {
         val agoraConfig = User.Agora(
             null,
             "Testing",
-            uid=uid
+            "0"
             )
         binding.toolbar.audioCall.setOnClickListener {
            /* FirebaseInstance.firebaseDb
@@ -181,8 +106,34 @@ class ChatActivity : AppCompatActivity() {
                 .child(receiverUid)
                 .child("agora")
                 .setValue(agoraConfig)*/
-            Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this@ChatActivity, CallActivity::class.java).apply {
+                putExtra("pic",picUrl)
+                putExtra("name",userName)
+            }
+            startActivity(intent)
         }
+
+        binding.toolbar.videoCall.setOnClickListener {
+            val intent = Intent(this@ChatActivity, VideoCallActivity::class.java).apply {
+                putExtra("pic",picUrl)
+                putExtra("name",userName)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private fun showDialog() {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Location")
+        dialog.setMessage("Are you sure want to add this location?")
+        dialog.setPositiveButton("Yes"){_,_->
+            finish()
+        }
+        dialog.setNegativeButton("No"){_,_->
+            this.finish()
+        }
+        dialog.create()
+        dialog.show()
     }
 
     private fun setChatBackground() {
@@ -332,6 +283,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun setThisBackgroundImageToFirebaseStrorage(backgroundImage: Uri?) {
         binding.chatBackground.setImageURI(backgroundImage)
         if (backgroundImage != null){

@@ -6,14 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentLoginBinding
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
-import com.example.firebasechat.ui.mainUi.MainActivity
+import com.example.firebasechat.ui.activity.MainActivity
 import com.example.firebasechat.utils.App
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.Utils
@@ -83,7 +81,7 @@ class LoginFragment : Fragment() {
                     Utils.createToast(App.context(),"Successfully Login")
                     binding.progressCircular.visibility = View.VISIBLE
                     binding.btnLogin.alpha = 1f
-                    startActivity(Intent(context,MainActivity::class.java))
+                    startActivity(Intent(context, MainActivity::class.java))
                     requireActivity().finish()
                 }else{
                     binding.progressCircular.visibility = View.GONE
