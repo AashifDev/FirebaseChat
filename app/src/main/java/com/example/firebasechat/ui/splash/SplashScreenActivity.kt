@@ -1,4 +1,4 @@
-package com.example.firebasechat.splash
+package com.example.firebasechat.ui.splash
 
 import android.annotation.SuppressLint
 import android.os.Bundle

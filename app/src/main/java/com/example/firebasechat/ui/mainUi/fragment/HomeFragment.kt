@@ -1,6 +1,5 @@
 package com.example.firebasechat.ui.mainUi.fragment
 
-import MyFirebaseMessagingService
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +28,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
-import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.StatusViewModel
@@ -38,18 +37,22 @@ import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
 import com.example.firebasechat.utils.Constant.CAMERA_REQ_CODE
 import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.Constant.VIDEO_REQ_CODE
-import com.example.firebasechat.utils.FirebaseInstance
+import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
 import com.example.firebasechat.utils.hide
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.messaging.FirebaseMessaging
+import io.grpc.okhttp.internal.proxy.Request
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 
 
 class HomeFragment : Fragment() {
@@ -71,7 +74,7 @@ class HomeFragment : Fragment() {
     var senderUid: String? = null
     var receiverUid = ""
     var senderRoom: String? = null
-
+    var token:String? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -96,9 +99,15 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.progressBarStatus.hide()
 
+        getFCMToken()
+
+        //askNotificationPermission()
+
         Handler().postDelayed({
-            val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
-            firebaseDb.child("user").child(uid).child("active").setValue(true)
+            if (firebaseAuth.currentUser != null){
+                val uid = firebaseAuth.currentUser?.uid.toString()
+                firebaseDb.child("user").child(uid).child("active").setValue(true)
+            }
         }, 15000)
 
 
@@ -116,15 +125,16 @@ class HomeFragment : Fragment() {
 
         senderRoom = receiverUid + senderUid
 
-        firebaseDb.child("chats").child(senderRoom!!).child("messages")
+        /*firebaseDb.child("chats").child(senderRoom!!).child("messages")
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     // Handle the data that was added to the database.
                     val value = snapshot.getValue(Message::class.java)
                     // Trigger the notification here.
                     val senderId = value!!.senderId
-                    if (!senderId!!.contains(FirebaseInstance.firebaseAuth.currentUser!!.uid)) {
-                        MyFirebaseMessagingService().createDefaultBuilder(value.message!!)
+                    if (!senderId!!.contains(firebaseAuth.currentUser!!.uid)) {
+                        MyFirebaseMessagingService1()
+                        //MyFirebaseMessagingService().createDefaultBuilder(value.message!!)
                     }
                 }
 
@@ -133,14 +143,94 @@ class HomeFragment : Fragment() {
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
                 override fun onCancelled(error: DatabaseError) {}
 
-            })
+            })*/
+
+        sendNotification()
+
+    }
+
+    private fun sendNotification() {
+        /*val SERVER_KEY: String = getString(R.string.SERVER_KEY)
+        val msg = "this is test message"
+        val title = "my title"
+        val token: String? = token
+
+        var obj: JSONObject? = null
+        var objData: JSONObject? = null
+        var dataobjData: JSONObject? = null
+
+        try {
+            obj = JSONObject()
+            objData = JSONObject()
+            objData.put("body", msg)
+            objData.put("title", title)
+            objData.put("sound", "default")
+            objData.put("icon", "icon_name") //   icon_name
+            objData.put("tag", token)
+            objData.put("priority", "high")
+            dataobjData = JSONObject()
+            dataobjData.put("text", msg)
+            dataobjData.put("title", title)
+            obj.put("to", token)
+            //obj.put("priority", "high");
+            obj.put("notification", objData)
+            obj.put("data", dataobjData)
+            Log.e("return here>>", obj.toString())
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        val jsObjRequest: JsonObjectRequest =
+            object : JsonObjectRequest(
+                Request.Method.POST, Constants.FCM_PUSH_URL, obj,
+                object : Listener<JSONObject?>() {
+                    fun onResponse(response: JSONObject) {
+                        Log.e("True", response.toString() + "")
+                    }
+                },
+                object : ErrorListener() {
+                    fun onErrorResponse(error: VolleyError) {
+                        Log.e("False", error.toString() + "")
+                    }
+                }) {
+                @get:Throws(AuthFailureError::class)
+                val headers: Map<String, String>?
+                    get() {
+                        val params: MutableMap<String, String> = HashMap()
+                        params["Authorization"] = "key=$SERVER_KEY"
+                        params["Content-Type"] = "application/json"
+                        return params
+                    }
+            }
+        val requestQueue: RequestQueue = Volley.newRequestQueue(this)
+        val socketTimeout = 1000 * 60 // 60 seconds
+
+        val policy: RetryPolicy = DefaultRetryPolicy(
+            socketTimeout,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        jsObjRequest.setRetryPolicy(policy)
+        requestQueue.add(jsObjRequest)*/
+    }
 
 
+    private fun getFCMToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.d("TAG", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            token = task.result
+            Log.d("TAG", "Token is $token")
+        })
     }
 
     private fun setStatusToOnline() {
         CoroutineScope(Dispatchers.IO).launch {
-            val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+            val uid = firebaseAuth.currentUser?.uid.toString()
             var isActive: Boolean = false
             firebaseDb.child("user").child(uid).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

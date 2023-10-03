@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.example.firebasechat.splash.fragment.SplashFragment"
+        android:name="com.example.firebasechat.ui.splash.fragment.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" />
     <fragment
         android:id="@+id/agreeContinueFragment"
-        android:name="com.example.firebasechat.splash.fragment.AgreeContinueFragment"
+        android:name="com.example.firebasechat.ui.splash.fragment.AgreeContinueFragment"
         android:label="fragment_agree_continue"
         tools:layout="@layout/fragment_agree_continue" />
 </navigation>

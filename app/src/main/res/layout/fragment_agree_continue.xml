@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".splash.fragment.SplashFragment">
+    tools:context=".ui.splash.fragment.SplashFragment">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageViewLogo"

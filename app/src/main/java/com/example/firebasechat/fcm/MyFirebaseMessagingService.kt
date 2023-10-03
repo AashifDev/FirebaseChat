@@ -1,3 +1,5 @@
+package com.example.firebasechat.fcm
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -5,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.example.firebasechat.ui.activity.ChatActivity
 import com.example.firebasechat.ui.activity.MainActivity
 import com.example.firebasechat.utils.App
 
@@ -16,8 +19,7 @@ class MyFirebaseMessagingService {
     //Default fcm
     fun createDefaultBuilder(message: String?) {
 
-        val notificationManager =
-            App.context()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = App.context()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // Create a unique notification channel for your app (required for Android 8.0 and higher).
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -29,7 +31,7 @@ class MyFirebaseMessagingService {
             notificationManager.createNotificationChannel(channel)
         }
         // Create an intent to launch your app when the user taps the notification.
-        val intent = Intent(App.context(), MainActivity::class.java)
+        val intent = Intent(App.context(), ChatActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val pendingIntent = PendingIntent.getActivity(
@@ -38,6 +40,7 @@ class MyFirebaseMessagingService {
             intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
+
         // Build the notification.
         val notificationBuilder = NotificationCompat.Builder(App.context()!!, channelId)
             .setSmallIcon(com.example.firebasechat.R.drawable.chat)

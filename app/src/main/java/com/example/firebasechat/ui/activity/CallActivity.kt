@@ -172,10 +172,11 @@ class CallActivity : AppCompatActivity() {
         options.channelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
         agoraEngine?.setEnableSpeakerphone(false)
         agoraEngine?.setDefaultAudioRoutetoSpeakerphone(false)
+        //agoraEngine?.joinChannel(null, "Testing", 0, options)
         agoraEngine?.joinChannel(null, "Testing", 0, options)
     }
 
-    fun joinLeaveChannel() {
+    private fun joinLeaveChannel() {
         if (isJoined) {
             agoraEngine!!.leaveChannel()
             //binding.text.text = "Join"
@@ -183,7 +184,7 @@ class CallActivity : AppCompatActivity() {
         } else {
             joinVoiceChannel()
             //binding.text.text = "Leave"
-            Toast.makeText(this, "Disconnected..", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Reconnecting..", Toast.LENGTH_SHORT).show()
         }
     }
 

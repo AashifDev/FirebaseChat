@@ -1,7 +1,9 @@
 package com.example.firebasechat.ui.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
@@ -9,14 +11,17 @@ import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
+import com.example.firebasechat.fcm.MyFirebaseMessagingService1.Companion.DATA_EXTRA
+import com.example.firebasechat.fcm.MyFirebaseMessagingService1.Companion.PATH_EXTRA
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
-import com.example.firebasechat.utils.FirebaseInstance
+import com.example.firebasechat.utils.CommonPermissionUtils.requestCommonPermission
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
@@ -51,6 +56,15 @@ class MainActivity : AppCompatActivity() {
 
         setClickOnBottomMenu()
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permissions = ArrayList<String?>()
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            requestCommonPermission(
+                this,  // Your FragmentActivity instance
+                permissions,  // List of permissions to request
+                {}
+            ) {}
+        }
 
     }
 
@@ -77,12 +91,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        handleIntentData(intent?.extras)
+    }
+
+    private fun handleIntentData(extras: Bundle?) {
+        if (extras != null) {
+            val data = extras.getString(DATA_EXTRA)
+
+            when(extras.getString(PATH_EXTRA)) {
+                "home_fragment" -> {
+                    navController.navigate(R.id.homeFragment, bundleOf(
+                        DATA_EXTRA to data
+                    ))
+                }
+            }
+        }
+    }
+
     private fun setClickOnDotMenu() {
         //Set on click on menu time
         binding.toolbar.toolbar.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.contact->{
-                    navController.navigate(R.id.action_homeFragment_to_newMessageFragment)
+                    navController.navigate(R.id.newMessageFragment)
                 }
                 R.id.profile->{
                     val currentId = firebaseAuth.currentUser?.uid
@@ -92,7 +126,8 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.profileFragment,bundle)
                 }
                 R.id.account->{
-                    //firebaseAuth.signOut()
+                    firebaseAuth.signOut()
+                    PrefManager.clear()
                     val intent = Intent(this, AuthMobileActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -114,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         //setupActionBarWithNavController(navController)
         binding.bottomNavigation.setupWithNavController(navController)
-        binding.toolbar.toolbar.setupWithNavController(navController)
+        //binding.toolbar.toolbar.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -125,7 +160,6 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.more_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
-
 
     private fun deleteAccount() {
         val current = firebaseAuth.currentUser!!
@@ -147,17 +181,17 @@ class MainActivity : AppCompatActivity() {
             finish()
             }else{
             //Utils.createToast(this, "Welcome Back!")
+            //Utils.createToast(this, current)
         }
         Log.d("tag", current.toString())
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        val uid = FirebaseInstance.firebaseAuth.currentUser?.uid.toString()
+        val uid = firebaseAuth.currentUser?.uid.toString()
         val lastSeen = Utils.dateTime(Calendar.getInstance())
+
         firebaseDb.child("user").child(uid).child("active").setValue(false)
         firebaseDb.child("user").child(uid).child("lastSeen").setValue(lastSeen)
     }
-
-
 }

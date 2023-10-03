@@ -8,17 +8,7 @@
         android:id="@+id/homeFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="ChitChat">
-        <action
-            android:id="@+id/action_homeFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_newMessageFragment"
-            app:destination="@id/newMessageFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_chat_nav_graph"
-            app:destination="@id/chat_nav_graph" />
-    </fragment>
+        android:label="ChitChat"/>
     <fragment
         android:id="@+id/newMessageFragment"
         android:name="com.example.firebasechat.ui.mainUi.fragment.NewMessageFragment"

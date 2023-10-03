@@ -38,6 +38,9 @@ class PrefManager(var context: Context) {
             return Gson().fromJson(Utils.getString(App.context(),"userData", ""),User::class.java)
         }
 
+        fun clear(){
+            Utils.clear(App.context()!!)
+        }
 
 
     }

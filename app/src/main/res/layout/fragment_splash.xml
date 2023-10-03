@@ -7,4 +7,4 @@
     android:layout_gravity="center"
     android:src="@drawable/chat"
     android:id="@+id/logo"
-    tools:context=".splash.fragment.SplashFragment"/>
+    tools:context=".ui.splash.fragment.SplashFragment"/>

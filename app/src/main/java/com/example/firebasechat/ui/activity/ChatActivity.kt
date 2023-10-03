@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -21,6 +22,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityChatBinding
+import com.example.firebasechat.fcm.MyFirebaseMessagingService1
 import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.MessageViewModel
@@ -29,6 +31,7 @@ import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -92,6 +95,8 @@ class ChatActivity : AppCompatActivity() {
         setChatBackground()
 
         setClickOnToolbarItem()
+
+        showTypingPlaceHolder()
     }
 
     private fun setClickOnToolbarItem() {
@@ -161,6 +166,7 @@ class ChatActivity : AppCompatActivity() {
                 val size = p0!!.length
                 if (size > 0) {
                     binding.send.setImageResource(R.drawable.send1)
+
                 } else {
                     binding.send.setImageResource(R.drawable.ic_mic)
                 }
@@ -211,7 +217,10 @@ class ChatActivity : AppCompatActivity() {
                     .child("user")
                     .child(FirebaseAuth.getInstance().currentUser!!.uid)
                     .child("typing").setValue(false)
+                binding.toolbar.isActive.text = "online"
                 binding.editTextWriteMessage.clearFocus()
+
+
             }
         }
     }
@@ -347,7 +356,6 @@ class ChatActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
-        showTypingPlaceHolder()
     }
 
     private fun validMessage(): Boolean {

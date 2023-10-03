@@ -1,4 +1,4 @@
-package com.example.firebasechat.splash.fragment
+package com.example.firebasechat.ui.splash.fragment
 
 import android.annotation.SuppressLint
 import android.content.Intent
