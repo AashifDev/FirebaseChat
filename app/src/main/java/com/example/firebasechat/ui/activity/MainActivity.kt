@@ -9,6 +9,7 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.Menu
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -57,13 +58,18 @@ class MainActivity : AppCompatActivity() {
         setClickOnBottomMenu()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permissions = ArrayList<String?>()
+            val permissions = ArrayList<String>()
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
             requestCommonPermission(
-                this,  // Your FragmentActivity instance
-                permissions,  // List of permissions to request
-                {}
-            ) {}
+                activity = this,
+                permissionList = permissions,
+                allPermissionApprovedListener = {
+                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+                },
+                anyPermissionDenyListener = {
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+                }
+            )
         }
 
     }

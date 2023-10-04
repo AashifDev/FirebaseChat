@@ -9,15 +9,15 @@ import com.permissionx.guolindev.request.ForwardScope
 object CommonPermissionUtils {
     fun requestCommonPermission(
         activity: FragmentActivity?,
-        permissionList: List<String?>?,
+        permissionList: ArrayList<String>?,
         allPermissionApprovedListener: Runnable?,
         anyPermissionDenyListener: Runnable?
     ) {
         PermissionX.init(activity!!)
-            .permissions(permissionList as List<String>)
-            .onForwardToSettings(ForwardToSettingsCallback { scope: ForwardScope, deniedList: List<String?>? ->
+            .permissions(permissionList!!)
+            .onForwardToSettings(ForwardToSettingsCallback { scope: ForwardScope, deniedList: List<String>? ->
                 scope.showForwardToSettingsDialog(
-                    deniedList as List<String>,
+                    deniedList!!,
                     "You need to allow necessary permissions in Settings manually",
                     "OK",
                     "Cancel"

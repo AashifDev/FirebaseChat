@@ -38,6 +38,14 @@ class PrefManager(var context: Context) {
             return Gson().fromJson(Utils.getString(App.context(),"userData", ""),User::class.java)
         }
 
+        fun saveFcmToken(token:String){
+            Utils.putString(App.context(),"token",token)
+        }
+
+        fun getFcmToken():String?{
+            return Utils.getString(App.context(),"token","")
+        }
+
         fun clear(){
             Utils.clear(App.context()!!)
         }

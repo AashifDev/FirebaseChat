@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Gravity
@@ -25,15 +26,29 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.Response.Listener
+import com.android.volley.RetryPolicy
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
+import com.example.firebasechat.model.Notification
+import com.example.firebasechat.model.NotificationRequestBody
+import com.example.firebasechat.model.NotificationResponse
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.StatusViewModel
 import com.example.firebasechat.mvvm.UserViewModel
+import com.example.firebasechat.network.MyViewModel
+import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
+import com.example.firebasechat.utils.Constant
 import com.example.firebasechat.utils.Constant.CAMERA_REQ_CODE
 import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.Constant.VIDEO_REQ_CODE
@@ -50,9 +65,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import io.grpc.okhttp.internal.proxy.Request
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
+import javax.xml.transform.ErrorListener
+import javax.xml.transform.TransformerException
 
 
 class HomeFragment : Fragment() {
@@ -63,6 +83,7 @@ class HomeFragment : Fragment() {
     lateinit var statusAdapter: StatusAdapter
     private val userViewModel by viewModels<UserViewModel>()
     private val statusViewModel by viewModels<StatusViewModel>()
+    private val vm by viewModels<MyViewModel>()
 
     var uid: String? = null
     var profile: Uri? = null
@@ -75,6 +96,7 @@ class HomeFragment : Fragment() {
     var receiverUid = ""
     var senderRoom: String? = null
     var token:String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -145,64 +167,134 @@ class HomeFragment : Fragment() {
 
             })*/
 
-        sendNotification()
+
+
 
     }
 
+    /*private fun noti() {
+
+        val msg = "this is test message"
+        val title = "my title"
+
+        var json: JSONObject? = null
+
+        val notification = Notification(
+            body = msg,
+            title = title,
+            type = "1234"
+        )
+
+        try {
+            *//*json = JSONObject()
+            jsonObj = JSONObject()
+            json.put("to", PrefManager.getFcmToken())
+
+
+
+            json.put("type","type")
+            json.put("title",title)
+            json.put("body",msg)
+
+
+            jsonObj.put("notification", json)
+
+            json.put("priority","high")
+
+            Log.e("return here>>", json.toString())*//*
+            json = JSONObject()
+            json.put("to",PrefManager.getFcmToken())
+            json.put("notification", notification)
+            json.put("priority","high")
+
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        val body = json!!.convertJsonToRequestBody()
+        vm.sendNotification(body)
+
+        vm.liveData.observe(viewLifecycleOwner){
+            if (it.code() == 200){
+                if (it.body()!!.success == 1){
+                    Toast.makeText(requireContext(), "Message id : ${it.body()!!.results.message_id}", Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(requireContext(), "Failed", Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                Toast.makeText(requireContext(), "Failedddd", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }*/
+
+    /*private fun JSONObject.convertJsonToRequestBody(): RequestBody {
+        return (RequestBody.create(
+            "application/json; charset=utf-8".toMediaTypeOrNull(),
+            this.toString()
+        ))
+    }
+
     private fun sendNotification() {
-        /*val SERVER_KEY: String = getString(R.string.SERVER_KEY)
+        val SERVER_KEY = getString(R.string.SERVER_KEY)
         val msg = "this is test message"
         val title = "my title"
         val token: String? = token
 
         var obj: JSONObject? = null
         var objData: JSONObject? = null
-        var dataobjData: JSONObject? = null
+        var dataObjData: JSONObject? = null
 
         try {
             obj = JSONObject()
             objData = JSONObject()
+
             objData.put("body", msg)
             objData.put("title", title)
             objData.put("sound", "default")
             objData.put("icon", "icon_name") //   icon_name
             objData.put("tag", token)
             objData.put("priority", "high")
-            dataobjData = JSONObject()
-            dataobjData.put("text", msg)
-            dataobjData.put("title", title)
+
+            dataObjData = JSONObject()
+
+            dataObjData.put("text", msg)
+            dataObjData.put("title", title)
             obj.put("to", token)
             //obj.put("priority", "high");
             obj.put("notification", objData)
-            obj.put("data", dataobjData)
+            obj.put("data", dataObjData)
             Log.e("return here>>", obj.toString())
+
         } catch (e: JSONException) {
             e.printStackTrace()
         }
 
         val jsObjRequest: JsonObjectRequest =
-            object : JsonObjectRequest(
-                Request.Method.POST, Constants.FCM_PUSH_URL, obj,
-                object : Listener<JSONObject?>() {
-                    fun onResponse(response: JSONObject) {
-                        Log.e("True", response.toString() + "")
+            object : JsonObjectRequest(Method.POST, Constant.FCM_PUSH_URL, obj,
+                Listener<JSONObject?> { response -> Log.d("True", response.toString() + "") },
+                object : ErrorListener, Response.ErrorListener {
+                    override fun onErrorResponse(error: VolleyError) {
+                        Log.d("False", error.toString() + "")
                     }
-                },
-                object : ErrorListener() {
-                    fun onErrorResponse(error: VolleyError) {
-                        Log.e("False", error.toString() + "")
-                    }
-                }) {
-                @get:Throws(AuthFailureError::class)
-                val headers: Map<String, String>?
-                    get() {
-                        val params: MutableMap<String, String> = HashMap()
-                        params["Authorization"] = "key=$SERVER_KEY"
-                        params["Content-Type"] = "application/json"
-                        return params
-                    }
+                    override fun warning(exception: TransformerException?) {}
+                    override fun error(exception: TransformerException?) {}
+                    override fun fatalError(exception: TransformerException?) {}
+
+                })
+            {
+                override fun getHeaders(): Map<String, String>? {
+                    val params: MutableMap<String, String> = HashMap()
+                    params["Authorization"] = "key=$SERVER_KEY"
+                    params["Content-Type"] = "application/json"
+                    params["Content-Length"] = "calculated when request is sent"
+                    params["Host"] = "calculated when request is sent"
+                    params["User-Agent"] = "PostmanRuntime/7.33.0"
+                    params["Accept-Encoding"] = "gzip, deflate, br"
+                    params["Connection"] = "keep-alive"
+                    return params
+                }
             }
-        val requestQueue: RequestQueue = Volley.newRequestQueue(this)
+        val requestQueue: RequestQueue = Volley.newRequestQueue(requireContext())
         val socketTimeout = 1000 * 60 // 60 seconds
 
         val policy: RetryPolicy = DefaultRetryPolicy(
@@ -210,9 +302,9 @@ class HomeFragment : Fragment() {
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
-        jsObjRequest.setRetryPolicy(policy)
-        requestQueue.add(jsObjRequest)*/
-    }
+        jsObjRequest.retryPolicy = policy
+        requestQueue.add(jsObjRequest)
+    }*/
 
 
     private fun getFCMToken() {
@@ -221,10 +313,10 @@ class HomeFragment : Fragment() {
                 Log.d("TAG", "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-
             // Get new FCM registration token
             token = task.result
             Log.d("TAG", "Token is $token")
+            PrefManager.saveFcmToken(task.result)
         })
     }
 

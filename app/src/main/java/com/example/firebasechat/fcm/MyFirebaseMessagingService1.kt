@@ -5,20 +5,15 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
-import android.widget.RemoteViews
-import androidx.core.app.NotificationCompat
-import com.example.firebasechat.R
 import com.example.firebasechat.ui.activity.ChatActivity
-import com.example.firebasechat.ui.activity.MainActivity
 import com.example.firebasechat.utils.setGroupNotification
 import com.example.firebasechat.utils.setNotification
+import com.example.firebasechat.utils.setNotificationWithPayLoad
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -86,6 +81,8 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
 
         const val PATH_EXTRA = "path"
         const val DATA_EXTRA = "data"
+
+        var token:String? = null
     }
 
     override fun onNewToken(token: String) {
@@ -102,20 +99,29 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.d("TAG", "Message data payload: ${remoteMessage.data}")
+
         }
+        Log.d("data", "Message data payload: ${remoteMessage.data}")
 
         // Check if message contains a notification payload.
-        remoteMessage.notification?.let {
+       /* remoteMessage.notification?.let {
             Log.d("TAG", "Message Notification Body: ${it.body}")
-            sendNotification(it.title, it.body, remoteMessage.data)
-        }
+            sendNotification(*//*it.title, it.body,*//* remoteMessage.data)
+        }*/
+
+        sendNotification(remoteMessage.notification!!.title, remoteMessage.notification!!.body, remoteMessage.data)
+
     }
 
     private fun sendNotification(
         title: String?,
         messageBody: String?,
-        data: Map<String, String>?
-    ) {
+        data: MutableMap<String, String>,
+        ) {
+
+       /* var  title: String? = null
+        var messageBody: String? = null*/
+
         val intent = Intent(this, ChatActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
@@ -126,6 +132,10 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
                 intent.putExtra(key, value)
             }
         }
+
+        /*title = data["title"]
+        messageBody = data["body"]*/
+
 
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
@@ -144,7 +154,16 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             notificationManager.createNotificationChannel(mChannel)
         }
 
-       val notification = setNotification(
+       val notificationPayLoad = setNotificationWithPayLoad(
+            channelId,
+            title,
+            messageBody,
+            defaultSoundUri,
+            GROUP_ID,
+            pendingIntent
+        )
+
+        val notification = setNotification(
             channelId,
             title,
             messageBody,
@@ -173,7 +192,6 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
 
         notificationBuilder.priority = NotificationCompat.PRIORITY_HIGH*/
-
 
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(intent)
