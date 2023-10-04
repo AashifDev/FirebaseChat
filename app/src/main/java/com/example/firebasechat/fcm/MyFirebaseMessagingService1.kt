@@ -10,6 +10,8 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.widget.RemoteViews
+import com.example.firebasechat.R
 import com.example.firebasechat.ui.activity.ChatActivity
 import com.example.firebasechat.utils.setGroupNotification
 import com.example.firebasechat.utils.setNotification
@@ -108,15 +110,31 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             Log.d("TAG", "Message Notification Body: ${it.body}")
             sendNotification(*//*it.title, it.body,*//* remoteMessage.data)
         }*/
+        //println("MyFirebaseMessagingService1.onMessageReceived::${remoteMessage.notification!!.title}")
 
-        sendNotification(remoteMessage.notification!!.title, remoteMessage.notification!!.body, remoteMessage.data)
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            remoteMessage.data.let {
+                sendNotification(it["title"], it["body"])
+            }
+        }else{
+            remoteMessage.data.let {
+                sendNotification(it["title"], it["body"])
+            }
+        }*/
+
+        remoteMessage.data.let {
+            sendNotification(it["title"], it["body"])
+        }
 
     }
+
+    /*private fun sendNotificationFor13(title: String?, body: String?) {
+        TODO("Not yet implemented")
+    }*/
 
     private fun sendNotification(
         title: String?,
         messageBody: String?,
-        data: MutableMap<String, String>,
         ) {
 
        /* var  title: String? = null
@@ -124,14 +142,6 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
 
         val intent = Intent(this, ChatActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-
-        if (data != null) {
-            for (i in 0 until data.size) {
-                val key = data.keys.toList()[i]
-                val value = data.values.toList()[i]
-                intent.putExtra(key, value)
-            }
-        }
 
         /*title = data["title"]
         messageBody = data["body"]*/
@@ -154,14 +164,6 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             notificationManager.createNotificationChannel(mChannel)
         }
 
-       val notificationPayLoad = setNotificationWithPayLoad(
-            channelId,
-            title,
-            messageBody,
-            defaultSoundUri,
-            GROUP_ID,
-            pendingIntent
-        )
 
         val notification = setNotification(
             channelId,
@@ -169,6 +171,8 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             messageBody,
             defaultSoundUri,
             GROUP_ID,
+            //getRemoteView(title!!),
+            //getRemoteViewExpanded(title!!,messageBody!!),
             pendingIntent
         )
 
@@ -180,6 +184,7 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             "New Notifications",
             "Notifications Grouped"
         )
+
 
         /*val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.chat)
@@ -207,4 +212,24 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
         notificationManager.notify(System.currentTimeMillis().toInt(), notification.build())
         notificationManager.notify(0, groupNotification)
     }
+
+    @SuppressLint("RemoteViewLayout")
+    private fun getRemoteView(title: String): RemoteViews? {
+        val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification)
+        remoteViews.setTextViewText(R.id.message,title)
+        remoteViews.setImageViewResource(R.id.image,R.drawable.chat,)
+
+        return remoteViews
+    }
+
+    @SuppressLint("RemoteViewLayout")
+    private fun getRemoteViewExpanded(title: String, body: String): RemoteViews? {
+        val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification_expanded)
+        remoteViews.setTextViewText(R.id.message,title)
+        remoteViews.setTextViewText(R.id.message,body)
+        remoteViews.setImageViewResource(R.id.image,R.drawable.chat,)
+
+        return remoteViews
+    }
+
 }

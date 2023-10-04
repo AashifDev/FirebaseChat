@@ -1,11 +1,13 @@
 package com.example.firebasechat.utils
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.view.View
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.firebasechat.R
@@ -24,17 +26,23 @@ fun Context.setNotification(
     body: String?,
     soundUri: Uri?,
     groupId: String?,
+    //remoteViews: RemoteViews?,
+    //remoteViewsExpanded: RemoteViews?,
     pendingIntent: PendingIntent,
 ): NotificationCompat.Builder {
+
     val notification = NotificationCompat.Builder(this, channelId)
         .setSmallIcon(R.drawable.chat)
-        .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.chat))
+        //.setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.chat))
         .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
         .setContentTitle(title)
-        .setContentText(body)
+        .setContentText(body)/*
+        .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+        .setCustomContentView(remoteViews)*/
         .setAutoCancel(true)
         .setSound(soundUri)
         .setGroupSummary(false)
+
 
     if (groupId != null)
         notification.setGroup(groupId)
@@ -43,7 +51,6 @@ fun Context.setNotification(
 
     return notification
 }
-
 
 fun Context.setNotificationWithPayLoad(
     channelId: String,
