@@ -7,70 +7,23 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
-import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
 import com.example.firebasechat.R
 import com.example.firebasechat.ui.activity.ChatActivity
 import com.example.firebasechat.utils.setGroupNotification
 import com.example.firebasechat.utils.setNotification
-import com.example.firebasechat.utils.setNotificationWithPayLoad
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import java.io.IOException
+import java.net.URL
+
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
-class MyFirebaseMessagingService1: FirebaseMessagingService() {
-
-    /*fun generateMessage(message: String?){
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        var builder: NotificationCompat.Builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.drawable.chat)
-            .setAutoCancel(true)
-            .setVibrate(longArrayOf(1000,1000,1000,1000))
-            .setOnlyAlertOnce(true)
-            .setContentIntent(pendingIntent)
-
-        builder = builder.setContent(getRemoteView(message!!))
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationChannel = NotificationChannel(channelId, CHANNEL_NAME,NotificationManager.IMPORTANCE_HIGH)
-        notificationManager.createNotificationChannel(notificationChannel)
-
-        notificationManager.notify(0,builder.build())
-    }
-
-    @SuppressLint("RemoteViewLayout")
-    private fun getRemoteView(message: String): RemoteViews? {
-        val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification)
-        remoteViews.setTextViewText(R.id.message,message)
-        remoteViews.setImageViewResource(R.id.image,R.drawable.chat,)
-
-        return remoteViews
-    }
-
-    override fun onMessageReceived(message: RemoteMessage) {
-        if (message.notification != null){
-            generateMessage(message.notification!!.body!!)
-        }
-
-
-        // Check if message contains a notification payload.
-        message.notification?.let {
-            generateMessage(message.notification!!.body!!)
-            Log.d("TAG", "Message Notification Body: ${it.body}")
-        }
-
-    }*/
+class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
 
     companion object {
 
@@ -103,14 +56,6 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             Log.d("TAG", "Message data payload: ${remoteMessage.data}")
 
         }
-        Log.d("data", "Message data payload: ${remoteMessage.data}")
-
-        // Check if message contains a notification payload.
-       /* remoteMessage.notification?.let {
-            Log.d("TAG", "Message Notification Body: ${it.body}")
-            sendNotification(*//*it.title, it.body,*//* remoteMessage.data)
-        }*/
-        //println("MyFirebaseMessagingService1.onMessageReceived::${remoteMessage.notification!!.title}")
 
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             remoteMessage.data.let {
@@ -123,22 +68,23 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
         }*/
 
         remoteMessage.data.let {
-            sendNotification(it["title"], it["body"])
+            sendNotification(it["title"], it["body"],it["image"])
+            //createNotification(it["title"], it["body"], it["image"])
+            Log.d("TAG", "Message data payload: ${remoteMessage.data}")
         }
 
     }
 
-    /*private fun sendNotificationFor13(title: String?, body: String?) {
-        TODO("Not yet implemented")
-    }*/
+    //private fun sendNotificationFor13(title: String?, body: String?) {}
 
     private fun sendNotification(
         title: String?,
         messageBody: String?,
-        ) {
+        url: String?,
+    ) {
 
-       /* var  title: String? = null
-        var messageBody: String? = null*/
+        /* var  title: String? = null
+         var messageBody: String? = null*/
 
         val intent = Intent(this, ChatActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -169,6 +115,7 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             channelId,
             title,
             messageBody,
+            url!!,
             defaultSoundUri,
             GROUP_ID,
             //getRemoteView(title!!),
@@ -185,19 +132,6 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             "Notifications Grouped"
         )
 
-
-        /*val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.chat)
-            .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.mipmap.ic_launcher))
-            .setContentTitle(getString(R.string.app_name))
-            .setStyle(NotificationCompat.BigTextStyle().bigText(messageBody))
-            .setContentText(messageBody)
-            .setAutoCancel(true)
-            .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
-
-        notificationBuilder.priority = NotificationCompat.PRIORITY_HIGH*/
-
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(intent)
 
@@ -206,30 +140,9 @@ class MyFirebaseMessagingService1: FirebaseMessagingService() {
             PendingIntent.FLAG_MUTABLE
         )
         notification.setContentIntent(resultPendingIntent)
-        //notificationManager.notify(1234, notificationBuilder.build())
 
         //ID of notification
         notificationManager.notify(System.currentTimeMillis().toInt(), notification.build())
         notificationManager.notify(0, groupNotification)
     }
-
-    @SuppressLint("RemoteViewLayout")
-    private fun getRemoteView(title: String): RemoteViews? {
-        val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification)
-        remoteViews.setTextViewText(R.id.message,title)
-        remoteViews.setImageViewResource(R.id.image,R.drawable.chat,)
-
-        return remoteViews
-    }
-
-    @SuppressLint("RemoteViewLayout")
-    private fun getRemoteViewExpanded(title: String, body: String): RemoteViews? {
-        val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification_expanded)
-        remoteViews.setTextViewText(R.id.message,title)
-        remoteViews.setTextViewText(R.id.message,body)
-        remoteViews.setImageViewResource(R.id.image,R.drawable.chat,)
-
-        return remoteViews
-    }
-
 }

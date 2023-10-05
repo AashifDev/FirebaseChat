@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import coil.load
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.RequestQueue
 import com.android.volley.Response
@@ -166,8 +167,6 @@ class HomeFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {}
 
             })*/
-
-
 
 
     }
@@ -337,11 +336,8 @@ class HomeFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {
                     Toast.makeText(requireContext(), error.message, Toast.LENGTH_SHORT).show()
                 }
-
             })
         }
-
-
     }
 
     private fun viewMyStatus() {
@@ -356,7 +352,8 @@ class HomeFragment : Fragment() {
                 statusList.addAll(it)
                 binding.progressBarStatus.hide()
                 it.forEach { url = it.statusUrl.toString() }
-                Glide.with(requireContext()).load(url).into(binding.statusImage)
+                //Glide.with(requireContext()).load(url).into(binding.statusImage)
+                binding.statusImage.load(url)
                 statusAdapter = StatusAdapter(requireContext(), it, this)
                 binding.recyclerViewStatus.adapter = statusAdapter
                 statusAdapter.setData(it)
