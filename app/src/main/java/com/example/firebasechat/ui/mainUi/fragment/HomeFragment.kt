@@ -38,6 +38,9 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
+import com.example.firebasechat.fcm.MyFirebaseMessagingService
+import com.example.firebasechat.fcm.MyFirebaseMessagingService1
+import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.Notification
 import com.example.firebasechat.model.NotificationRequestBody
 import com.example.firebasechat.model.NotificationResponse
@@ -57,8 +60,10 @@ import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
 import com.example.firebasechat.utils.hide
+import com.example.firebasechat.utils.setNotification
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -156,7 +161,7 @@ class HomeFragment : Fragment() {
                     // Trigger the notification here.
                     val senderId = value!!.senderId
                     if (!senderId!!.contains(firebaseAuth.currentUser!!.uid)) {
-                        MyFirebaseMessagingService1()
+                        MyFirebaseMessagingService().createDefaultBuilder(value.message)
                         //MyFirebaseMessagingService().createDefaultBuilder(value.message!!)
                     }
                 }
@@ -168,43 +173,37 @@ class HomeFragment : Fragment() {
 
             })*/
 
+        noti()
 
     }
 
-    /*private fun noti() {
+    private fun noti() {
 
         val msg = "this is test message"
         val title = "my title"
 
         var json: JSONObject? = null
-
-        val notification = Notification(
-            body = msg,
-            title = title,
-            type = "1234"
-        )
+        var jsonObj: JSONObject? = null
+        var jsonObData: JSONObject? = null
 
         try {
-            *//*json = JSONObject()
-            jsonObj = JSONObject()
-            json.put("to", PrefManager.getFcmToken())
-
-
-
-            json.put("type","type")
-            json.put("title",title)
-            json.put("body",msg)
-
-
-            jsonObj.put("notification", json)
-
-            json.put("priority","high")
-
-            Log.e("return here>>", json.toString())*//*
             json = JSONObject()
-            json.put("to",PrefManager.getFcmToken())
-            json.put("notification", notification)
+
+            json.put("to", "fvpN9-1VQ_-2MmdnB1zAsg:APA91bEPf7Clpj7lskS91H7xZwQa-Ej-dli4HfdQzR-bmRVwafkScoCcJgq0_90TcDqCjamD0syhg-nnaBgfMwn9BUxP4a7P_WzZeyoMbKG3Pqbzm2_4sx-XR-OYfiufcuqmV_zvOS2H")
+
+            jsonObj = JSONObject()
+            jsonObj.put("type","type")
+            jsonObj.put("title",title)
+            jsonObj.put("body",msg)
+            jsonObj.put("image","hjgjhghjghjgjhgjhgjh")
+
+            Log.e("return here>>", json.toString())
+
+            json.put("data", jsonObj)
+
             json.put("priority","high")
+
+
 
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -214,7 +213,7 @@ class HomeFragment : Fragment() {
         vm.sendNotification(body)
 
         vm.liveData.observe(viewLifecycleOwner){
-            if (it.code() == 200){
+            if (it.isSuccessful){
                 if (it.body()!!.success == 1){
                     Toast.makeText(requireContext(), "Message id : ${it.body()!!.results.message_id}", Toast.LENGTH_SHORT).show()
                 }else{
@@ -224,15 +223,16 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failedddd", Toast.LENGTH_SHORT).show()
             }
         }
-    }*/
+    }
 
-    /*private fun JSONObject.convertJsonToRequestBody(): RequestBody {
+    private fun JSONObject.convertJsonToRequestBody(): RequestBody {
         return (RequestBody.create(
             "application/json; charset=utf-8".toMediaTypeOrNull(),
             this.toString()
         ))
     }
 
+/*
     private fun sendNotification() {
         val SERVER_KEY = getString(R.string.SERVER_KEY)
         val msg = "this is test message"

@@ -1,14 +1,19 @@
 package com.example.firebasechat.network
 
-import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.utils.Constant
+import com.example.firebasechat.utils.Constant.SERVER_KEY
+import com.google.logging.type.HttpRequest
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+
 
 class Retrofit {
-    val SERVER_KEY = Constant.SERVER_KEY
 
     var mOkHttpClient = OkHttpClient.Builder().addInterceptor { chain ->
         chain.proceed(chain.request().newBuilder().also {
@@ -29,6 +34,37 @@ class Retrofit {
         client.addInterceptor(logging).build()
     }.build()
 
+
+    inner class HeaderInterceptor : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val originalRequest: Request = chain.request()
+
+            // Add your custom header here
+            val newRequest: Request = originalRequest.newBuilder()
+                .header("Cache-Control", "no-cache")
+                .header("Postman-Token", "calculated when request is sent")
+                .header("Content-Type", "application/json")
+                .header("Content-Length", "calculated when request is sent")
+                .header("Host", "calculated when request is sent")
+                .header("User-Agent", "PostmanRuntime/7.33.0")
+                .header("User-Agent", "PostmanRuntime/7.33.0")
+                .header("Accept", "*/*")
+                .header("Accept-Encoding", "gzip, deflate, br")
+                .header("Connection", "keep-alive")
+                .header("Authorization", "key=$SERVER_KEY")
+                .build()
+
+            return chain.proceed(newRequest)
+        }
+    }
+
+    fun createOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(HeaderInterceptor())
+            .build()
+    }
+
+
     var mRetrofit: ApiInterface? = null
 
     val loginClient: ApiInterface?
@@ -40,6 +76,7 @@ class Retrofit {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(ApiInterface::class.java)
+
             }
             return mRetrofit
         }

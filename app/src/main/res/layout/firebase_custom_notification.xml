@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#485FFC9F"
+    android:layout_margin="8dp">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/image"/>
+
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/image"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtTitle"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chitchat"/>
+
+        <TextView
+            android:id="@+id/txtBody"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:text="This is notification body."/>
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/ll"
+        android:layout_toEndOf="@id/image"
+        android:id="@+id/bigPicture"/>
+
+</RelativeLayout>

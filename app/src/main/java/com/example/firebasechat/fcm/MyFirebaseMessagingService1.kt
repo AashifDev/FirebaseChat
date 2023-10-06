@@ -7,23 +7,19 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.example.firebasechat.R
+import androidx.annotation.RequiresApi
 import com.example.firebasechat.ui.activity.ChatActivity
 import com.example.firebasechat.utils.setGroupNotification
 import com.example.firebasechat.utils.setNotification
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import java.io.IOException
-import java.net.URL
 
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
-class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
+class MyFirebaseMessagingService1 : FirebaseMessagingService() {
 
     companion object {
 
@@ -50,6 +46,7 @@ class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
         Log.d("TAG", "handleNewToken: $token")
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
@@ -68,7 +65,7 @@ class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
         }*/
 
         remoteMessage.data.let {
-            sendNotification(it["title"], it["body"],it["image"])
+            sendNotification(it["title"], it["body"],it["image"],it["bigPicture"])
             //createNotification(it["title"], it["body"], it["image"])
             Log.d("TAG", "Message data payload: ${remoteMessage.data}")
         }
@@ -77,10 +74,12 @@ class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
 
     //private fun sendNotificationFor13(title: String?, body: String?) {}
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun sendNotification(
         title: String?,
         messageBody: String?,
         url: String?,
+        bigPicture:String?
     ) {
 
         /* var  title: String? = null
@@ -107,6 +106,7 @@ class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
             val mChannel = NotificationChannel(
                 channelId, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH
             )
+            notificationManager.areBubblesEnabled()
             notificationManager.createNotificationChannel(mChannel)
         }
 
@@ -116,11 +116,11 @@ class MyFirebaseMessagingService1<Bitmap> : FirebaseMessagingService() {
             title,
             messageBody,
             url!!,
+            bigPicture!!,
             defaultSoundUri,
             GROUP_ID,
-            //getRemoteView(title!!),
-            //getRemoteViewExpanded(title!!,messageBody!!),
-            pendingIntent
+            pendingIntent,
+
         )
 
         val groupNotification = setGroupNotification(

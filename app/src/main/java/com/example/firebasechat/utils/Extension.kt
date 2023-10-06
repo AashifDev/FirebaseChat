@@ -5,19 +5,15 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
-import android.widget.RemoteViews.RemoteView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.firebasechat.R
-import java.io.IOException
-import java.net.URL
+
 
 fun View.hide() {
     this.visibility = View.GONE
@@ -31,35 +27,27 @@ fun Context.setNotification(
     channelId: String,
     title: String?,
     body: String?,
-    url:String,
+    url: String,
+    bigPicture: String,
     soundUri: Uri?,
     groupId: String?,
-    //remoteViews: RemoteViews?,
-    //remoteViewsExpanded: RemoteViews?,
     pendingIntent: PendingIntent,
 ): NotificationCompat.Builder {
 
     val notificationLayoutExpanded = notificationLayoutExpanded(
+        App.context()!!,
         packageName,
         title,
         body,
         url,
-        R.layout.firebase_push_notification
+        bigPicture,
+        R.layout.firebase_custom_notification
     )
-
-    var image: Bitmap? = null
-
-    try {
-        val urll = URL(url)
-        image = BitmapFactory.decodeStream(urll.openConnection().getInputStream())
-    } catch (e: IOException) {
-        println(e)
-    }
 
     val notification = NotificationCompat.Builder(this, channelId)
         .setSmallIcon(R.drawable.chat)
         //.setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.chat))
-        .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
+        .setColor(ContextCompat.getColor(applicationContext, com.example.firebasechat.R.color.blue))
         .setContentTitle(title)
         .setContentText(body)/*
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -67,10 +55,24 @@ fun Context.setNotification(
         .setAutoCancel(true)
         .setSound(soundUri)
         .setGroupSummary(false)
+        .setBubbleMetadata(
+            setBubbleNotification(
+                channelId,
+                title,
+                body,
+                url,
+                bigPicture,
+                soundUri,
+                groupId,
+                pendingIntent
+            )
+        )
+        .setBigPictureStyle(title, body, url)
+        //.setCustomNotification(title,body,url,App.context()!!)
         .setCustomBigContentView(notificationLayoutExpanded)
-        //.setStyle(NotificationCompat.BigPictureStyle().bigPicture(image))
-        //.setCustomNotification(title,body,url)
-        //.setBigPictureStyle(title,body,url)
+    //.setStyle(NotificationCompat.BigPictureStyle().bigPicture(image))
+    //.setCustomNotification(title,body,url)
+    //.setBigPictureStyle(title,body,url)
 
 
     if (groupId != null)
@@ -81,41 +83,75 @@ fun Context.setNotification(
     return notification
 }
 
+fun setBubbleNotification(
+    channelId: String,
+    title: String?,
+    body: String?,
+    url: String,
+    bigPicture: String,
+    soundUri: Uri?,
+    groupId: String?,
+    pendingIntent: PendingIntent
+): NotificationCompat.BubbleMetadata? {
+    val builder = NotificationCompat.BubbleMetadata.Builder()
+
+    return builder.setDesiredHeight(600)
+        .setIntent(pendingIntent)
+        .setAutoExpandBubble(true)
+        .setSuppressNotification(true)
+        .build()
+
+}
+
 fun notificationLayoutExpanded(
+    context: Context,
     packageName: String?,
     title: String?,
     body: String?,
     url: String,
+    bigPicture: String,
     firebasePushNotification: Int
 ): RemoteViews? {
 
-    val remoteView = RemoteViews(packageName,firebasePushNotification)
+    val remoteView = RemoteViews(packageName, firebasePushNotification)
 
-    var image: Bitmap? = null
+    remoteView.setTextViewText(R.id.txtTitle, title)
+    remoteView.setTextViewText(R.id.txtBody, body)
 
-    try {
-        val urll = URL(url)
-        image = BitmapFactory.decodeStream(urll.openConnection().getInputStream())
-    } catch (e: IOException) {
-        println(e)
-    }
-
-
-
-    remoteView.setTextViewText(R.id.title, title)
-    remoteView.setTextViewText(R.id.text, body)
-
-    Glide.with(App.context()!!)
-        .asBitmap()
-        .load(url)
-        .into(object : CustomTarget<Bitmap>(){
+    /*----------Working fine-----------------*/
+    /*val awt: AppWidgetTarget =
+        object : AppWidgetTarget(context.applicationContext, R.id.image, remoteView, R.id.image) {
             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                remoteView.setImageViewBitmap(R.id.imageViewLogo, resource)
+                super.onResourceReady(resource, transition)
             }
-            override fun onLoadCleared(placeholder: Drawable?) {}
-        })
+        }
+
+    val options = RequestOptions().override(300, 300).placeholder(R.drawable.chat)
+        .error(R.drawable.camera_icon)
+
+    Glide.with(context.applicationContext).asBitmap().load(url).apply(options).into(awt)*/
+
+    /*----------Working fine-----------------*/
+    try {
+        val image1: Bitmap = Glide.with(context)
+            .asBitmap()
+            .load(url)
+            .submit(55, 55)
+            .get()
 
 
+        val image2: Bitmap = Glide.with(context)
+            .asBitmap()
+            .load(bigPicture)
+            .submit(250, 250)
+            .get()
+
+        remoteView.setImageViewBitmap(R.id.image, image2)
+        remoteView.setImageViewBitmap(R.id.bigPicture, image1)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
     return remoteView
 }
 
@@ -123,24 +159,28 @@ fun notificationLayoutExpanded(
 fun NotificationCompat.Builder.setCustomNotification(
     title: String?,
     text: String?,
-    url: String?
+    url: String?,
+    context: Context,
 ): NotificationCompat.Builder {
     // inflate the layout and set the values to our UI IDs
-    var image: Bitmap? = null
-
-    try {
-        val urll = URL(url)
-        image = BitmapFactory.decodeStream(urll.openConnection().getInputStream())
-    } catch (e: IOException) {
-        println(e)
-    }
 
     val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification)
 
     remoteViews.setTextViewText(R.id.title, title)
     remoteViews.setTextViewText(R.id.text, text)
 
-    remoteViews.setImageViewBitmap(R.id.image, image)
+    try {
+        val image: Bitmap = Glide.with(context)
+            .asBitmap()
+            .load(url)
+            .submit(250, 250)
+            .get()
+
+        remoteViews.setImageViewBitmap(R.id.image, image)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 
     setCustomContentView(remoteViews)
 
@@ -153,24 +193,51 @@ private fun NotificationCompat.Builder.setBigPictureStyle(
     url: String
 ): NotificationCompat.Builder {
 
-    var image: android.graphics.Bitmap? = null
+    val remoteViews = RemoteViews("com.example.firebasechat", R.layout.firebase_push_notification)
+
+    remoteViews.setTextViewText(R.id.title, title)
+    remoteViews.setTextViewText(R.id.text, text)
 
     try {
-        val url = URL(url)
-        image = BitmapFactory.decodeStream(url.openConnection().getInputStream())
-    } catch (e: IOException) {
-        println(e)
+        val image: Bitmap = Glide.with(App.context()!!)
+            .asBitmap()
+            .load(url)
+            .submit(250, 250)
+            .get()
+
+        remoteViews.setImageViewBitmap(R.id.image, image)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
 
-    setLargeIcon(image)
-    setStyle(
-        NotificationCompat.BigPictureStyle()
-            .bigPicture(image)
-            .setBigContentTitle(title)
-            .setSummaryText(text)
-    )
+    setCustomContentView(remoteViews)
     return this
 }
+
+
+
+fun Context.setGroupNotification(
+    channelId: String,
+    groupId: String,
+    groupSummary: Boolean,
+    lineText: String,
+    bigContentTitle: String,
+    summaryText: String,
+): Notification = NotificationCompat.Builder(this, channelId)
+    .setSmallIcon(R.drawable.chat)
+    .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.chat))
+    .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
+    .setStyle(
+        NotificationCompat.InboxStyle()
+            .addLine(lineText)
+            .setBigContentTitle(bigContentTitle)
+            .setSummaryText(summaryText)
+    )
+    .setGroup(groupId)
+    .setGroupSummary(groupSummary)
+    .setAutoCancel(true)
+    .build()
 
 
 fun Context.setNotificationWithPayLoad(
@@ -198,27 +265,3 @@ fun Context.setNotificationWithPayLoad(
 
     return notification
 }
-
-fun Context.setGroupNotification(
-    channelId: String,
-    groupId: String,
-    groupSummary: Boolean,
-    lineText: String,
-    bigContentTitle: String,
-    summaryText: String,
-): Notification = NotificationCompat.Builder(this, channelId)
-    .setSmallIcon(R.drawable.chat)
-    .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.chat))
-    .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
-    .setStyle(
-        NotificationCompat.InboxStyle()
-            .addLine(lineText)
-            .setBigContentTitle(bigContentTitle)
-            .setSummaryText(summaryText)
-    )
-    .setGroup(groupId)
-    .setGroupSummary(groupSummary)
-    .setAutoCancel(true)
-    .build()
-
-
