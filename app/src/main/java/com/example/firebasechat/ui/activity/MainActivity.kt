@@ -18,8 +18,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
-import com.example.firebasechat.fcm.MyFirebaseMessagingService1.Companion.DATA_EXTRA
-import com.example.firebasechat.fcm.MyFirebaseMessagingService1.Companion.PATH_EXTRA
+import com.example.firebasechat.fcm.FirebaseMessagingService.Companion.DATA_EXTRA
+import com.example.firebasechat.fcm.FirebaseMessagingService.Companion.PATH_EXTRA
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.authWithMobile.AuthMobileActivity
 import com.example.firebasechat.utils.CommonPermissionUtils.requestCommonPermission

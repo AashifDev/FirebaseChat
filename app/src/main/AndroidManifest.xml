@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.CAMERA" /> <!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices. -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:name=".utils.App"
@@ -68,20 +69,21 @@
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="false"
+            android:allowEmbedded="true"
+            android:resizeableActivity="true"
             android:screenOrientation="locked" />
 
         <service
-            android:name=".fcm.MyFirebaseMessagingService1"
+            android:name=".fcm.FirebaseMessagingService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <!--<service
+        <service
             android:name=".Services.FcmService"
-            android:exported="true" />-->
-
+            android:exported="true" />
         <!-- [START fcm_default_channel] -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

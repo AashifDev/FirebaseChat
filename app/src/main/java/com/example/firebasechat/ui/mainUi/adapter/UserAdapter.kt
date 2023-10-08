@@ -13,13 +13,13 @@ import com.example.firebasechat.R
 import com.example.firebasechat.model.User
 import com.example.firebasechat.ui.activity.ChatActivity
 import com.example.firebasechat.ui.activity.MainActivity
+import com.example.firebasechat.ui.mainUi.fragment.HomeFragment
 import de.hdodenhof.circleimageview.CircleImageView
 
 
 class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val listener:Fragment) : RecyclerView.Adapter<UserAdapter.ViewHolder>(){
 
     val activity: MainActivity? = null
-    var setOnClickListener: ((User)-> Unit)? = null
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val user:TextView = itemView.findViewById(R.id.userName)
@@ -67,6 +67,10 @@ class UserAdapter(val context: Context, val usrArrList: ArrayList<User>, val lis
         }else{
             holder.isActive.visibility = View.GONE
         }
+
+        /*when (listener){
+            is HomeFragment ->{listener.getUid(item.uid)}
+        }*/
 
     }
 }

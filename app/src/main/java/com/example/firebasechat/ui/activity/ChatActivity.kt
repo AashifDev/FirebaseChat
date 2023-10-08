@@ -1,6 +1,5 @@
 package com.example.firebasechat.ui.activity
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,9 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -22,7 +19,6 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityChatBinding
-import com.example.firebasechat.fcm.MyFirebaseMessagingService1
 import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.MessageViewModel
@@ -31,19 +27,9 @@ import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.FirebaseInstance
 import com.example.firebasechat.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.Constants
-import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.RtcEngineConfig
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -211,7 +197,7 @@ class ChatActivity : AppCompatActivity() {
     private fun sendMessage() {
         binding.send.setOnClickListener {
             if (validMessage()) {
-                viewModel.sendMessage(message, senderUid)
+                viewModel.sendMessage(userName,message, senderUid,picUrl)
                 binding.editTextWriteMessage.text?.clear()
                 FirebaseInstance.firebaseDb
                     .child("user")

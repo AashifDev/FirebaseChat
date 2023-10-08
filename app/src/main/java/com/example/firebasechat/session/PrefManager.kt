@@ -46,6 +46,14 @@ class PrefManager(var context: Context) {
             return Utils.getString(App.context(),"token","")
         }
 
+        fun saveRoomId(roomId:String){
+            Utils.putString(App.context(),"roomId",roomId)
+        }
+
+        fun getRoomId():String?{
+            return Utils.getString(App.context(),"roomId","")
+        }
+
         fun clear(){
             Utils.clear(App.context()!!)
         }

@@ -19,7 +19,7 @@ import com.google.firebase.messaging.RemoteMessage
 
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
-class MyFirebaseMessagingService1 : FirebaseMessagingService() {
+class FirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
 
@@ -94,7 +94,7 @@ class MyFirebaseMessagingService1 : FirebaseMessagingService() {
 
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_MUTABLE
         )
 
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -106,7 +106,6 @@ class MyFirebaseMessagingService1 : FirebaseMessagingService() {
             val mChannel = NotificationChannel(
                 channelId, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH
             )
-            notificationManager.areBubblesEnabled()
             notificationManager.createNotificationChannel(mChannel)
         }
 

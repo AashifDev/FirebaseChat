@@ -63,7 +63,7 @@ class ViewSendMessageFragment : Fragment() {
 
         binding.send.setOnClickListener {
             if (validMessage()){
-                viewModel.sendMessage(message, senderUid)
+                //viewModel.sendMessage(message, senderUid)
                 binding.editTextWriteMessage.text?.clear()
             }
         }

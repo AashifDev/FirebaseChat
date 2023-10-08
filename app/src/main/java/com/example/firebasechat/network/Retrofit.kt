@@ -2,6 +2,7 @@ package com.example.firebasechat.network
 
 import com.example.firebasechat.utils.Constant
 import com.example.firebasechat.utils.Constant.SERVER_KEY
+import com.google.gson.GsonBuilder
 import com.google.logging.type.HttpRequest
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -73,7 +74,7 @@ class Retrofit {
                 mRetrofit = Retrofit.Builder()
                     .baseUrl(Constant.FCM_PUSH_URL)
                     .client(mOkHttpClient)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
                     .build()
                     .create(ApiInterface::class.java)
 

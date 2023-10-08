@@ -3,12 +3,15 @@ package com.example.firebasechat.utils
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ShortcutInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
@@ -55,6 +58,7 @@ fun Context.setNotification(
         .setAutoCancel(true)
         .setSound(soundUri)
         .setGroupSummary(false)
+        .setShortcutId(generateShortcutId(channelId))
         .setBubbleMetadata(
             setBubbleNotification(
                 channelId,
@@ -67,6 +71,10 @@ fun Context.setNotification(
                 pendingIntent
             )
         )
+        /*.setBubbleMetadata(bubbleData)
+        .setShortcutId(shortcutId)*/
+        .addPerson(chatPartner)
+        .addPerson(chatPartner)
         .setBigPictureStyle(title, body, url)
         //.setCustomNotification(title,body,url,App.context()!!)
         .setCustomBigContentView(notificationLayoutExpanded)
@@ -93,15 +101,49 @@ fun setBubbleNotification(
     groupId: String?,
     pendingIntent: PendingIntent
 ): NotificationCompat.BubbleMetadata? {
-    val builder = NotificationCompat.BubbleMetadata.Builder()
+
+    val icon: Bitmap = Glide.with(App.context()!!)
+        .asBitmap()
+        .load(url)
+        .submit(55, 55)
+        .get()
+
+    val builder = NotificationCompat.BubbleMetadata.Builder(pendingIntent,
+        IconCompat.createWithResource(App.context()!!, R.drawable.chat))
 
     return builder.setDesiredHeight(600)
         .setIntent(pendingIntent)
         .setAutoExpandBubble(true)
         .setSuppressNotification(true)
+        //.setIcon(IconCompat.createWithAdaptiveBitmap(icon))
+        .setAutoExpandBubble(true)
+        .setSuppressNotification(true)
+        .setIcon(IconCompat.createWithResource(App.context()!!,R.drawable.chat))
         .build()
 
 }
+
+val chatPartner = Person.Builder()
+    .setName("Chat partner")
+    .setImportant(true)
+    .build()
+
+val category = "com.example.firebasechat"
+
+fun generateShortcutId(channelId: String): String? {
+    val shortcut =
+        ShortcutInfo.Builder(App.context()!!, channelId)
+            .setCategories(setOf(category))
+            .setIntent(Intent(Intent.ACTION_DEFAULT))
+            .setLongLived(true)
+            .setShortLabel(chatPartner.name!!)
+            .build()
+
+    return channelId
+}
+
+
+
 
 fun notificationLayoutExpanded(
     context: Context,

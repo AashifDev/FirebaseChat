@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Gravity
@@ -27,23 +26,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import coil.load
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.Response.Listener
-import com.android.volley.RetryPolicy
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.FragmentHomeBinding
+import com.example.firebasechat.fcm.FirebaseMessagingService
 import com.example.firebasechat.fcm.MyFirebaseMessagingService
-import com.example.firebasechat.fcm.MyFirebaseMessagingService1
 import com.example.firebasechat.model.Message
-import com.example.firebasechat.model.Notification
-import com.example.firebasechat.model.NotificationRequestBody
-import com.example.firebasechat.model.NotificationResponse
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.StatusViewModel
@@ -52,7 +39,6 @@ import com.example.firebasechat.network.MyViewModel
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.ui.mainUi.adapter.StatusAdapter
 import com.example.firebasechat.ui.mainUi.adapter.UserAdapter
-import com.example.firebasechat.utils.Constant
 import com.example.firebasechat.utils.Constant.CAMERA_REQ_CODE
 import com.example.firebasechat.utils.Constant.GALLERY_REQ_CODE
 import com.example.firebasechat.utils.Constant.VIDEO_REQ_CODE
@@ -60,7 +46,6 @@ import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
 import com.example.firebasechat.utils.hide
-import com.example.firebasechat.utils.setNotification
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -68,17 +53,13 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
-import io.grpc.okhttp.internal.proxy.Request
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
-import javax.xml.transform.ErrorListener
-import javax.xml.transform.TransformerException
 
 
 class HomeFragment : Fragment() {
@@ -145,24 +126,25 @@ class HomeFragment : Fragment() {
             uploadStatus()
         }
 
+
         setUserToRecyclerView()
         setStatusRecyclerView()
 
         //setStatusToOnline()
-        senderUid = FirebaseAuth.getInstance().currentUser?.uid.toString()
 
-        senderRoom = receiverUid + senderUid
-
-        /*firebaseDb.child("chats").child(senderRoom!!).child("messages")
+        firebaseDb.child("chats").child(PrefManager.getRoomId().toString()).child("messages")
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     // Handle the data that was added to the database.
                     val value = snapshot.getValue(Message::class.java)
                     // Trigger the notification here.
                     val senderId = value!!.senderId
+                    val name = value.name
+                    val message = value.message
+                    val senderProfileUrl = value.senderProfileUrl
+                    //   Toast.makeText(App.context(), value.message, Toast.LENGTH_SHORT).show()
                     if (!senderId!!.contains(firebaseAuth.currentUser!!.uid)) {
-                        MyFirebaseMessagingService().createDefaultBuilder(value.message)
-                        //MyFirebaseMessagingService().createDefaultBuilder(value.message!!)
+                        MyFirebaseMessagingService().createDefaultBuilder(name,message,senderProfileUrl)
                     }
                 }
 
@@ -171,9 +153,8 @@ class HomeFragment : Fragment() {
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
                 override fun onCancelled(error: DatabaseError) {}
 
-            })*/
+            })
 
-        noti()
 
     }
 
@@ -513,7 +494,4 @@ class HomeFragment : Fragment() {
         }
     }
 
-    fun getUid(uid: String?) {
-        receiverUid = uid!!
-    }
 }
