@@ -12,9 +12,13 @@ import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.firebasechat.R
+import com.example.firebasechat.ui.activity.MainActivity
+import com.example.firebasechat.ui.activity.VideoCallActivity
+import com.google.firebase.ktx.BuildConfig
 
 class FcmService : Service(){
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -24,11 +28,13 @@ class FcmService : Service(){
             } else {
                 ""
             }
+
+
         val notificationBuilder = NotificationCompat.Builder(this, channelId )
         val notification = notificationBuilder.setOngoing(false)
             .setSmallIcon(R.drawable.chat)
             .setPriority(Notification.PRIORITY_MIN)
-            .setContentTitle("Chitchat")
+            .setContentTitle("Incoming Call")
             .setCategory(Notification.CATEGORY_SERVICE)
             .build()
 

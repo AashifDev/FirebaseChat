@@ -18,6 +18,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
+import com.example.firebasechat.fcm.CallNotification
 import com.example.firebasechat.fcm.FirebaseMessagingService.Companion.DATA_EXTRA
 import com.example.firebasechat.fcm.FirebaseMessagingService.Companion.PATH_EXTRA
 import com.example.firebasechat.session.PrefManager
@@ -44,6 +45,8 @@ class MainActivity : AppCompatActivity() {
         //If you using setSupportActionBar then u have to manually inflate menu option
         setSupportActionBar(binding.toolbar.toolbar)
         //supportActionBar?.title = "ChitChat"
+
+        CallNotification().createDefaultBuilder(null,null,null)
 
         setNavHostFragment()
 

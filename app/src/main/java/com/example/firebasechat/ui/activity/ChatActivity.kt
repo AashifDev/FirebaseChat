@@ -9,6 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +19,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
+import com.example.firebasechat.Services.FcmService
 import com.example.firebasechat.databinding.ActivityChatBinding
+import com.example.firebasechat.fcm.CallNotification
 import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.MessageViewModel
@@ -105,11 +108,13 @@ class ChatActivity : AppCompatActivity() {
         }
 
         binding.toolbar.videoCall.setOnClickListener {
-            val intent = Intent(this@ChatActivity, VideoCallActivity::class.java).apply {
+            /*val intent = Intent(this@ChatActivity, VideoCallActivity::class.java).apply {
                 putExtra("pic",picUrl)
                 putExtra("name",userName)
             }
             startActivity(intent)
+            */
+
         }
     }
 
@@ -197,7 +202,7 @@ class ChatActivity : AppCompatActivity() {
     private fun sendMessage() {
         binding.send.setOnClickListener {
             if (validMessage()) {
-                viewModel.sendMessage(userName,message, senderUid,picUrl)
+                //viewModel.sendMessage(userName,message, senderUid,picUrl)
                 binding.editTextWriteMessage.text?.clear()
                 FirebaseInstance.firebaseDb
                     .child("user")
@@ -205,8 +210,7 @@ class ChatActivity : AppCompatActivity() {
                     .child("typing").setValue(false)
                 binding.toolbar.isActive.text = "online"
                 binding.editTextWriteMessage.clearFocus()
-
-
+                CallNotification().createDefaultBuilder(null,null,null)
             }
         }
     }
@@ -373,4 +377,9 @@ class ChatActivity : AppCompatActivity() {
             .child("typing").setValue(false)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent?.action == "101")
+            Toast.makeText(this, "Call Appected", Toast.LENGTH_SHORT).show()
+    }
 }
