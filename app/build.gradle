@@ -111,4 +111,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:23.2.1'
 
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+
+    //Google Play Billing Library In app purchase
+    implementation("com.android.billingclient:billing-ktx:6.0.1")
 }

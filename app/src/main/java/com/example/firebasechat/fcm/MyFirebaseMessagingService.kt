@@ -16,12 +16,15 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
+import android.util.DisplayMetrics
+import android.widget.ImageView
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.example.firebasechat.R
 import com.example.firebasechat.ui.activity.ChatActivity
 import com.example.firebasechat.utils.App
+import com.example.firebasechat.utils.setNotification
 
 
 class MyFirebaseMessagingService {
@@ -57,7 +60,7 @@ class MyFirebaseMessagingService {
 
         // Build the notification.
         val notificationBuilder = NotificationCompat.Builder(App.context()!!, channelId)
-            .setSmallIcon(com.example.firebasechat.R.drawable.chat)
+            .setSmallIcon(R.drawable.chat)
             .setContentTitle("New Message")
             .setContentText(message)
             .setAutoCancel(true)
@@ -88,10 +91,11 @@ fun NotificationCompat.Builder.setCustomNotification(
             .submit(30, 30)
             .get()
 
-
         remoteViews.setTextViewText(R.id.senderName, name)
         remoteViews.setTextViewText(R.id.senderMessage, message)
-        remoteViews.setImageViewBitmap(R.id.profileImage, image)
+        remoteViews.setImageViewBitmap(R.id.profileImage, getCircleBitmapImg(image))
+
+
 
     } catch (e: Exception) {
         e.printStackTrace()
@@ -104,151 +108,28 @@ fun NotificationCompat.Builder.setCustomNotification(
     return this
 }
 
-private fun getCircleBitmap(bitmap: Bitmap): Bitmap {
-    val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(output)
-    val color = Color.RED
-    val paint = Paint()
-    val rect = Rect(0, 0,bitmap.width, bitmap.height)
-    val rectF = RectF(rect)
-    paint.isAntiAlias = true
-    canvas.drawARGB(0, 0, 0, 0)
-    paint.color = color
-    canvas.drawOval(rectF, paint)
-    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-    canvas.drawBitmap(bitmap, rect, rect, paint)
-    bitmap.recycle()
-    return output
-}
-
-fun getCircleBitmap1(bitmap: Bitmap): Bitmap? {
-    val output: Bitmap
-    val srcRect: Rect
-    val dstRect: Rect
-    val r: Float
-    val width = bitmap.width
-    val height = bitmap.height
-    if (width > height) {
-        output = Bitmap.createBitmap(height, height, Bitmap.Config.ARGB_8888)
-        val left = (width - height) / 2
-        val right = left + height
-        srcRect = Rect(left, 0, right, height)
-        dstRect = Rect(0, 0, height, height)
-        r = (height / 2).toFloat()
-    } else {
-        output = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888)
-        val top = (height - width) / 2
-        val bottom = top + width
-        srcRect = Rect(0, top, width, bottom)
-        dstRect = Rect(0, 0, width, width)
-        r = (width / 2).toFloat()
-    }
-    val canvas = Canvas(output)
-    val color = -0xbdbdbe
-    val paint = Paint()
-    paint.isAntiAlias = true
-    canvas.drawARGB(0, 0, 0, 0)
-    paint.color = color
-    canvas.drawCircle(r, r, r, paint)
-    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-    canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
-    bitmap.recycle()
-    return output
-}
-
-private fun getCircleBitmap2(bitmap: Bitmap): Bitmap? {
+private fun getCircleBitmapImg(bitmap: Bitmap): Bitmap {
     val output = Bitmap.createBitmap(
         bitmap.width,
-        bitmap.height, Bitmap.Config.ARGB_8888
+        bitmap.height,
+        Bitmap.Config.ARGB_8888
     )
     val canvas = Canvas(output)
-    val color = Color.RED
+
+    val color = -0xbdbdbe
     val paint = Paint()
     val rect = Rect(0, 0, bitmap.width, bitmap.height)
-    val rectF = RectF(rect)
+
     paint.isAntiAlias = true
     canvas.drawARGB(0, 0, 0, 0)
     paint.color = color
-    canvas.drawOval(rectF, paint)
+
+    canvas.drawCircle(
+        bitmap.width / 2f, bitmap.height / 2f,
+        bitmap.width / 2f, paint
+    )
     paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     canvas.drawBitmap(bitmap, rect, rect, paint)
-    bitmap.recycle()
-    return output
-}
-
-private fun getCircleBitmap3(bitmap: Bitmap): Bitmap
-
-{
-
-    var srcRect: Rect
-
-    var dstRect: Rect
-
-    var r: Float
-
-    var paint = Paint();
-
-    var width: Int = bitmap.getWidth()
-
-    var height: Int = bitmap.getHeight()
-
-    var widthToGenerate = 100F
-
-    var heightToGenerate = 100F
-
-    var borderWidth: Float = 1.toFloat()
-
-    var output: Bitmap
-
-    var canvas: Canvas
-
-    if (width > height) {
-
-        output = Bitmap.createBitmap(widthToGenerate.toInt(), heightToGenerate.toInt(), Bitmap.Config.ARGB_8888);
-
-        canvas = Canvas(output);
-        val scale: Float = (widthToGenerate / width)
-
-
-        var xTranslation = 0.0f
-        var yTranslation: Float = (heightToGenerate - height * scale) / 2.0f;
-
-
-        var transformation = Matrix();
-        transformation.postTranslate(xTranslation, yTranslation)
-        transformation.preScale(scale, scale)
-
-        var color: Int = Color.WHITE
-        paint.setAntiAlias(true)
-        paint.setColor(color)
-
-        canvas.drawBitmap(bitmap, transformation, paint)
-
-    } else {
-        output = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888)
-        canvas = Canvas(output);
-        var top: Int = (height - width) / 2
-        var bottom: Int = top + width
-        srcRect = Rect(0, top, width, bottom)
-        dstRect = Rect(0, 0, width, width);
-        r = (width / 2).toFloat()
-
-
-        var color: Int = Color.GRAY
-        paint.setAntiAlias(true)
-        canvas.drawARGB(0, 0, 0, 0)
-        paint.setColor(color)
-
-
-        canvas.drawCircle(r + borderWidth, r + borderWidth, r + borderWidth, paint)
-        canvas.drawCircle(r, r, r, paint)
-        paint.setXfermode(PorterDuffXfermode(PorterDuff.Mode.SRC_IN))
-
-        canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
-
-        bitmap.recycle()
-    }
 
     return output
-
 }

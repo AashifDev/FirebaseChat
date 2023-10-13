@@ -4,8 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesUpdatedListener
 import com.example.firebasechat.databinding.FragmentViewStatusBinding
 import com.example.firebasechat.model.Status
 import com.example.firebasechat.mvvm.StatusViewModel
@@ -18,6 +24,7 @@ class ViewStatusFragment : Fragment() {
     lateinit var statusList: ArrayList<Status>
     lateinit var adapter: StatusAdapter
     private val viewModel by viewModels<StatusViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -25,21 +32,22 @@ class ViewStatusFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentViewStatusBinding.inflate(layoutInflater, container, false)
 
-        statusList = ArrayList()
+       /* statusList = ArrayList()
         binding.progressBar.show()
         binding.noStatus.hide()
-
+*/
         return binding.root
     }
 
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        binding.userProfile.setOnClickListener{
-
-        }
 
 
-        setStatusToRecyclerView()
+
+        //setStatusToRecyclerView()
     }
 
     private fun setStatusToRecyclerView() {
@@ -81,5 +89,7 @@ class ViewStatusFragment : Fragment() {
 
         })*/
     }
+
+
 
 }

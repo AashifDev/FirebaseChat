@@ -22,6 +22,7 @@ import com.example.firebasechat.R
 import com.example.firebasechat.Services.FcmService
 import com.example.firebasechat.databinding.ActivityChatBinding
 import com.example.firebasechat.fcm.CallNotification
+import com.example.firebasechat.fcm.MyFirebaseMessagingService
 import com.example.firebasechat.model.Message
 import com.example.firebasechat.model.User
 import com.example.firebasechat.mvvm.MessageViewModel
@@ -37,12 +38,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class ChatActivity : AppCompatActivity() {
+
     lateinit var binding: ActivityChatBinding
     lateinit var adapter: MessageAdapter
     lateinit var msgList: ArrayList<Message>
 
-    var senderRoom: String? = null
-    var receiverRoom: String? = null
+    private var senderRoom: String? = null
+    private var receiverRoom: String? = null
 
     private val viewModel by viewModels<MessageViewModel>()
     var PERMISSION_REQ_ID_RECORD_AUDIO = 101
@@ -202,7 +204,7 @@ class ChatActivity : AppCompatActivity() {
     private fun sendMessage() {
         binding.send.setOnClickListener {
             if (validMessage()) {
-                //viewModel.sendMessage(userName,message, senderUid,picUrl)
+                viewModel.sendMessage(userName,message, senderUid,picUrl)
                 binding.editTextWriteMessage.text?.clear()
                 FirebaseInstance.firebaseDb
                     .child("user")
@@ -210,7 +212,8 @@ class ChatActivity : AppCompatActivity() {
                     .child("typing").setValue(false)
                 binding.toolbar.isActive.text = "online"
                 binding.editTextWriteMessage.clearFocus()
-                CallNotification().createDefaultBuilder(null,null,null)
+                //CallNotification().createDefaultBuilder(null,null,null)
+
             }
         }
     }

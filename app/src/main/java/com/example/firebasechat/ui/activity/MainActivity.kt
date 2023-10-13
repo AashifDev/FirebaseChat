@@ -16,6 +16,17 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.SkuDetails
+import com.android.billingclient.api.SkuDetailsParams
+import com.android.billingclient.api.queryProductDetails
 import com.example.firebasechat.R
 import com.example.firebasechat.databinding.ActivityMainBinding
 import com.example.firebasechat.fcm.CallNotification
@@ -27,6 +38,13 @@ import com.example.firebasechat.utils.CommonPermissionUtils.requestCommonPermiss
 import com.example.firebasechat.utils.FirebaseInstance.firebaseAuth
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
 import com.example.firebasechat.utils.Utils
+import com.google.common.collect.ImmutableList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 
@@ -35,6 +53,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var prefManager: PrefManager
     lateinit var navController: NavController
     private lateinit var vibrator: Vibrator
+    lateinit var billingClient: BillingClient
+    private val courseList = listOf("Video Calling", "Audio Calling")
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar.toolbar)
         //supportActionBar?.title = "ChitChat"
 
-        CallNotification().createDefaultBuilder(null,null,null)
+        //CallNotification().createDefaultBuilder(null,null,null)
 
         setNavHostFragment()
 
@@ -59,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         setClickOnDotMenu()
 
         setClickOnBottomMenu()
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permissions = ArrayList<String>()

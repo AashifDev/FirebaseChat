@@ -6,8 +6,8 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:id="@+id/profileImage"
         android:background="@android:color/transparent"
         android:contentDescription="Profile Image" />
@@ -41,6 +41,7 @@
             android:text="Hello how are you bro."
             android:ellipsize="end"
             android:id="@+id/senderMessage"/>
+
     </LinearLayout>
 
 </RelativeLayout>

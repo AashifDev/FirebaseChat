@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.firebasechat.fcm.MyFirebaseMessagingService
 import com.example.firebasechat.model.Message
 import com.example.firebasechat.session.PrefManager
 import com.example.firebasechat.utils.FirebaseInstance.firebaseDb
@@ -65,6 +66,5 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                 PrefManager.saveRoomId(receiverRoom!!)
             }
 
-       // MyFirebaseMessagingService().createDefaultBuilder(msg.message)
     }
 }
